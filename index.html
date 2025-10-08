@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Space Bitcoin Mission</title>
+    <title>Space Gold Mission</title>
     <style>
         * {
             margin: 0;
@@ -50,12 +50,12 @@
             display: flex;
             justify-content: space-between;
             pointer-events: none;
-            font-size: min(2.5vw, 16px);
+            font-size: min(2.2vw, 14px);
         }
         
         .ui-panel {
             background: rgba(10, 10, 42, 0.8);
-            padding: 6px 10px;
+            padding: 5px 8px;
             border-radius: 5px;
             border: 1px solid #4a9eff;
             margin: 0 2px;
@@ -81,9 +81,9 @@
             color: #ff00cc;
         }
         
-        #bitcoin-display {
+        #gold-display {
             font-weight: bold;
-            color: #FF9900;
+            color: #FFD700;
         }
         
         #start-screen, #level-complete, #game-over, #mission-screen, #ship-select-screen {
@@ -100,6 +100,7 @@
             z-index: 10;
             padding: 15px;
             text-align: center;
+            overflow-y: auto;
         }
         
         #level-complete, #game-over, #mission-screen, #ship-select-screen {
@@ -107,38 +108,40 @@
         }
         
         h1 {
-            font-size: min(8vw, 48px);
-            margin-bottom: 15px;
+            font-size: min(6vw, 36px);
+            margin-bottom: 10px;
             color: #4a9eff;
             text-shadow: 0 0 10px rgba(74, 158, 255, 0.7);
+            line-height: 1.2;
         }
         
         h2 {
-            font-size: min(6vw, 36px);
-            margin-bottom: 15px;
+            font-size: min(5vw, 28px);
+            margin-bottom: 10px;
             color: #ffcc00;
+            line-height: 1.2;
         }
         
         p {
-            font-size: min(4vw, 18px);
-            margin-bottom: 15px;
+            font-size: min(3.5vw, 16px);
+            margin-bottom: 12px;
             text-align: center;
-            max-width: 90%;
-            line-height: 1.5;
+            max-width: 95%;
+            line-height: 1.4;
         }
         
         .btn {
             background: linear-gradient(to bottom, #4a9eff, #2a5aaa);
             color: white;
             border: none;
-            padding: 10px 20px;
-            font-size: min(4vw, 18px);
+            padding: 8px 16px;
+            font-size: min(3.5vw, 16px);
             border-radius: 30px;
             cursor: pointer;
             transition: all 0.3s;
             box-shadow: 0 0 15px rgba(74, 158, 255, 0.5);
-            margin: 5px;
-            min-width: 140px;
+            margin: 4px;
+            min-width: 130px;
         }
         
         .btn:hover {
@@ -156,46 +159,46 @@
         }
         
         .controls-info {
-            margin-top: 15px;
+            margin-top: 12px;
             background: rgba(74, 158, 255, 0.2);
-            padding: 10px;
+            padding: 8px;
             border-radius: 10px;
             text-align: center;
-            max-width: 90%;
+            max-width: 95%;
         }
         
         .controls-info h3 {
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: #ffcc00;
-            font-size: min(4vw, 18px);
+            font-size: min(3.5vw, 16px);
         }
         
         .upgrade-info {
-            margin-top: 12px;
+            margin-top: 10px;
             background: rgba(255, 204, 0, 0.2);
-            padding: 10px;
+            padding: 8px;
             border-radius: 10px;
             text-align: center;
-            max-width: 90%;
+            max-width: 95%;
         }
         
         .upgrade-info h3 {
             color: #ffcc00;
-            margin-bottom: 5px;
-            font-size: min(4vw, 18px);
+            margin-bottom: 4px;
+            font-size: min(3.5vw, 16px);
         }
         
         .ship-evolution {
             display: flex;
             justify-content: center;
-            margin: 15px 0;
+            margin: 12px 0;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
         }
         
         .ship-stage {
             text-align: center;
-            margin: 0 5px;
+            margin: 0 4px;
         }
         
         .ship-stage.active {
@@ -203,9 +206,9 @@
         }
         
         .ship-icon {
-            width: 40px;
-            height: 50px;
-            margin: 0 auto 5px;
+            width: 35px;
+            height: 45px;
+            margin: 0 auto 4px;
             background: linear-gradient(to bottom, #4a9eff, #2a5aaa);
             clip-path: polygon(50% 0%, 100% 30%, 80% 100%, 20% 100%, 0% 30%);
         }
@@ -221,20 +224,20 @@
             left: 50%;
             transform: translateX(-50%);
             background: rgba(0, 255, 0, 0.7);
-            padding: 6px 12px;
+            padding: 5px 10px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 11px;
             display: none;
             z-index: 5;
         }
         
         .mission-info {
             background: rgba(255, 204, 0, 0.2);
-            padding: 10px;
+            padding: 8px;
             border-radius: 10px;
-            margin: 8px 0;
+            margin: 6px 0;
             text-align: center;
-            max-width: 90%;
+            max-width: 95%;
         }
         
         .achievement-popup {
@@ -243,7 +246,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background: rgba(0, 0, 0, 0.9);
-            padding: 15px;
+            padding: 12px;
             border-radius: 10px;
             border: 2px solid #ffcc00;
             text-align: center;
@@ -254,11 +257,11 @@
         
         .ship-option {
             display: inline-block;
-            margin: 8px;
+            margin: 6px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            padding: 8px;
+            padding: 6px;
         }
         
         .ship-option:hover {
@@ -268,13 +271,13 @@
         .ship-option.selected {
             border: 2px solid #ffcc00;
             border-radius: 10px;
-            padding: 8px;
+            padding: 6px;
         }
         
         .ship-preview {
-            width: 50px;
-            height: 70px;
-            margin: 0 auto 5px;
+            width: 45px;
+            height: 60px;
+            margin: 0 auto 4px;
             background: linear-gradient(to bottom, #4a9eff, #2a5aaa);
             clip-path: polygon(50% 0%, 100% 30%, 80% 100%, 20% 100%, 0% 30%);
         }
@@ -296,21 +299,21 @@
             bottom: 10px;
             right: 10px;
             background: rgba(0, 0, 0, 0.7);
-            padding: 6px;
+            padding: 5px;
             border-radius: 5px;
-            font-size: 10px;
+            font-size: 9px;
             display: none;
         }
         
-        .bitcoin-indicator {
+        .gold-indicator {
             position: absolute;
             bottom: 80px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255, 153, 0, 0.7);
-            padding: 6px 12px;
+            background: rgba(255, 215, 0, 0.7);
+            padding: 5px 10px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 11px;
             display: none;
             z-index: 5;
         }
@@ -321,7 +324,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background: rgba(0, 0, 0, 0.8);
-            padding: 15px;
+            padding: 12px;
             border-radius: 10px;
             border: 2px solid #ffcc00;
             text-align: center;
@@ -330,11 +333,64 @@
             max-width: 80%;
         }
 
-        .bitcoin-summary {
-            background: rgba(255, 153, 0, 0.2);
-            padding: 10px;
+        .gold-summary {
+            background: rgba(255, 215, 0, 0.2);
+            padding: 8px;
             border-radius: 10px;
-            margin: 10px 0;
+            margin: 8px 0;
+            font-size: min(3.5vw, 16px);
+        }
+
+        .rocket-info {
+            background: rgba(255, 85, 0, 0.2);
+            padding: 8px;
+            border-radius: 10px;
+            margin: 8px 0;
+            font-size: min(3.5vw, 16px);
+        }
+
+        .boss-warning {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #ff0000;
+            text-align: center;
+            z-index: 95;
+            display: none;
+            max-width: 80%;
+            animation: pulse 1s infinite;
+        }
+
+        #sound-toggle {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(10, 10, 42, 0.8);
+            border: 1px solid #4a9eff;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        #sound-toggle:hover {
+            background: rgba(74, 158, 255, 0.8);
+        }
+
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.05); }
+            100% { transform: translate(-50%, -50%) scale(1); }
         }
 
         @media (max-height: 700px) {
@@ -343,8 +399,16 @@
             }
             
             .btn {
-                padding: 8px 16px;
-                min-width: 120px;
+                padding: 6px 12px;
+                min-width: 110px;
+            }
+            
+            h1 {
+                font-size: min(5vw, 28px);
+            }
+            
+            h2 {
+                font-size: min(4.5vw, 24px);
             }
         }
 
@@ -356,11 +420,31 @@
             
             .ui-panel {
                 margin: 2px;
-                padding: 4px 8px;
+                padding: 4px 6px;
             }
             
             .ship-option {
-                margin: 5px;
+                margin: 4px;
+            }
+            
+            .ship-preview {
+                width: 40px;
+                height: 55px;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .ship-evolution {
+                gap: 5px;
+            }
+            
+            .ship-stage {
+                margin: 0 2px;
+            }
+            
+            .ship-icon {
+                width: 30px;
+                height: 40px;
             }
         }
     </style>
@@ -374,7 +458,7 @@
                 <div id="level-indicator">LIVELLO: 1</div>
             </div>
             <div class="ui-panel">
-                <div id="score-display">PUNTEGGIO: 0</div>
+                <div id="score-display">PUNTI: 0</div>
             </div>
             <div class="ui-panel">
                 <div id="special-weapon">RAZZI: 0</div>
@@ -383,49 +467,63 @@
                 <div id="combo-display">COMBO: 1x</div>
             </div>
             <div class="ui-panel">
-                <div id="bitcoin-display">BITCOIN: 0</div>
+                <div id="gold-display">GOLD: 0</div>
             </div>
         </div>
         
+        <button id="sound-toggle">🔊</button>
+        
         <div id="power-up-indicator" class="power-up-indicator"></div>
-        <div id="bitcoin-indicator" class="bitcoin-indicator">+0.5 BITCOIN!</div>
+        <div id="gold-indicator" class="gold-indicator">+1 GOLD!</div>
         <div id="evolution-notification" class="evolution-notification">
             <h3>NAVICELLA EVOLUTA!</h3>
             <p id="evolution-details">La tua navicella ha raggiunto un nuovo livello!</p>
         </div>
+        <div id="boss-warning" class="boss-warning">
+            <h3>BOSS IN ARRIVO!</h3>
+            <p>Preparati ad affrontare un potente nemico!</p>
+        </div>
         <div id="debug-info"></div>
         
         <div id="start-screen">
-            <h1>MISSIONE SPAZIALE BITCOIN</h1>
-            <p>Distruggi gli asteroidi, raccogli Bitcoin e fai evolvere la tua navicella!</p>
+            <h1>MISSIONE SPAZIALE GOLD</h1>
+            <p>Distruggi gli asteroidi, raccogli monete d'oro e fai evolvere la tua navicella!</p>
             
             <div class="ship-evolution">
                 <div class="ship-stage">
                     <div class="ship-icon"></div>
                     <div>LIVELLO 1</div>
-                    <div>0-9 BTC</div>
+                    <div>0-9 GOLD</div>
                 </div>
                 <div class="ship-stage">
                     <div class="ship-icon"></div>
                     <div>LIVELLO 2</div>
-                    <div>10-19 BTC</div>
+                    <div>10-19 GOLD</div>
                 </div>
                 <div class="ship-stage">
                     <div class="ship-icon"></div>
                     <div>LIVELLO 3</div>
-                    <div>20+ BTC</div>
+                    <div>20+ GOLD</div>
                 </div>
             </div>
             
             <button id="start-btn" class="btn">INIZIA MISSIONE</button>
             <button id="select-ship-btn" class="btn btn-ship">SELEZIONA NAVICELLA</button>
+            
+            <div class="rocket-info">
+                <h3>RAZZI SPECIALI</h3>
+                <p>Ottieni 1 razzo ogni 2 monete d'oro raccolte!</p>
+                <p>Premi <strong>V</strong> per sparare i razzi</p>
+            </div>
+            
             <div class="controls-info">
                 <h3>CONTROLLI</h3>
-                <p>FRECCE: Muovi la navicella<br>SPAZIO: Sparare raggi<br>A: Razzi speciali</p>
+                <p>FRECCE: Muovi la navicella<br>SPAZIO: Sparare raggi<br>V: Razzi speciali</p>
             </div>
+            
             <div class="upgrade-info">
                 <h3>EVOLUZIONE AUTOMATICA</h3>
-                <p>La navicella si evolve automaticamente ogni 10 Bitcoin raccolti!</p>
+                <p>La navicella si evolve automaticamente ogni 10 monete d'oro raccolte!</p>
             </div>
         </div>
         
@@ -467,9 +565,9 @@
         <div id="level-complete">
             <h2>LIVELLO COMPLETATO!</h2>
             <p id="level-complete-text">Ottimo lavoro! Passa al livello successivo.</p>
-            <div class="bitcoin-summary">
-                <p>Bitcoin raccolti: <span id="level-bitcoin-earned">0</span></p>
-                <p>Bitcoin totali: <span id="total-bitcoin-after-level">0</span></p>
+            <div class="gold-summary">
+                <p>Monete d'oro raccolte: <span id="level-gold-earned">0</span></p>
+                <p>Monete d'oro totali: <span id="total-gold-after-level">0</span></p>
             </div>
             <button id="next-level-btn" class="btn">LIVELLO SUCCESSIVO</button>
         </div>
@@ -477,8 +575,8 @@
         <div id="game-over">
             <h2>MISSIONE FALLITA</h2>
             <p id="game-over-text">La tua navicella è stata distrutta!</p>
-            <div class="bitcoin-summary">
-                <p>Bitcoin raccolti: <span id="gameover-bitcoin-earned">0</span></p>
+            <div class="gold-summary">
+                <p>Monete d'oro raccolte: <span id="gameover-gold-earned">0</span></p>
                 <p>Punteggio: <span id="gameover-score">0</span></p>
             </div>
             <button id="restart-btn" class="btn">RIPROVA</button>
@@ -522,18 +620,115 @@
         const scoreDisplay = document.getElementById('score-display');
         const specialWeaponDisplay = document.getElementById('special-weapon');
         const comboDisplay = document.getElementById('combo-display');
-        const bitcoinDisplay = document.getElementById('bitcoin-display');
+        const goldDisplay = document.getElementById('gold-display');
         const levelCompleteText = document.getElementById('level-complete-text');
         const gameOverText = document.getElementById('game-over-text');
         const missionText = document.getElementById('mission-text');
         const missionProgress = document.getElementById('mission-progress');
         const powerUpIndicator = document.getElementById('power-up-indicator');
-        const bitcoinIndicator = document.getElementById('bitcoin-indicator');
+        const goldIndicator = document.getElementById('gold-indicator');
         const evolutionNotification = document.getElementById('evolution-notification');
         const evolutionDetails = document.getElementById('evolution-details');
+        const bossWarning = document.getElementById('boss-warning');
         const achievementPopup = document.getElementById('achievement-popup');
         const achievementName = document.getElementById('achievement-name');
         const achievementDesc = document.getElementById('achievement-desc');
+        const soundToggle = document.getElementById('sound-toggle');
+        
+        // ========== AUDIO SETUP ==========
+        let soundEnabled = true;
+        
+        // Funzione per generare suoni proceduralmente
+        function createShootSound() {
+            if (!soundEnabled) return;
+            
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.type = 'square';
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.1);
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.1);
+        }
+        
+        function createExplosionSound() {
+            if (!soundEnabled) return;
+            
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.type = 'sawtooth';
+            oscillator.frequency.setValueAtTime(150, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.5);
+            
+            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+        
+        function createMoneySound() {
+            if (!soundEnabled) return;
+            
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // Do
+            oscillator.frequency.exponentialRampToValueAtTime(659.25, audioContext.currentTime + 0.1); // Mi
+            oscillator.frequency.exponentialRampToValueAtTime(783.99, audioContext.currentTime + 0.2); // Sol
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.3);
+        }
+        
+        function createFreezeSound() {
+            if (!soundEnabled) return;
+            
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(1000, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(300, audioContext.currentTime + 0.5);
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+        
+        // Toggle suono
+        soundToggle.addEventListener('click', function() {
+            soundEnabled = !soundEnabled;
+            soundToggle.textContent = soundEnabled ? '🔊' : '🔇';
+        });
         
         // ========== GAME VARIABLES ==========
         let gameActive = false;
@@ -541,8 +736,8 @@
         let score = 0;
         let rocksDestroyed = 0;
         let specialRockets = 0;
-        let bitcoinCount = 0;
-        let bitcoinEarnedThisLevel = 0;
+        let goldCount = 0;
+        let goldEarnedThisLevel = 0;
         let shipLevel = 1;
         let player;
         let bullets = [];
@@ -550,9 +745,10 @@
         let rocks = [];
         let enemies = [];
         let powerUps = [];
-        let bitcoins = [];
+        let golds = [];
         let stars = [];
         let particles = [];
+        let boss = null;
         let keys = {};
         let combo = 0;
         let multiplier = 1;
@@ -606,60 +802,73 @@
         // ========== LEVEL CONFIGURATION ==========
         const levels = {
             1: {
-                rocks: 10,
+                rocks: 15,
                 rockHealth: 3,
                 playerSpeed: 5,
                 bgColor: '#0a0a2a',
+                bgPattern: 'milkyWay',
                 bulletSpeed: 10,
                 bulletDamage: 1,
-                specialRocketsUnlock: 3,
-                enemies: 2,
-                boss: false
-            },
-            2: {
-                rocks: 15,
-                rockHealth: 4,
-                playerSpeed: 5,
-                bgColor: '#0a1a2a',
-                bulletSpeed: 10,
-                bulletDamage: 1,
-                specialRocketsUnlock: 3,
                 enemies: 3,
                 boss: false
             },
-            3: {
+            2: {
                 rocks: 20,
-                rockHealth: 5,
+                rockHealth: 4,
                 playerSpeed: 5,
-                bgColor: '#1a0a2a',
-                bulletSpeed: 12,
+                bgColor: '#0a1a2a',
+                bgPattern: 'nebula',
+                bulletSpeed: 10,
                 bulletDamage: 1,
-                specialRocketsUnlock: 3,
                 enemies: 4,
                 boss: true,
                 bossType: 'alien'
             },
-            4: {
+            3: {
                 rocks: 25,
-                rockHealth: 6,
+                rockHealth: 5,
                 playerSpeed: 5,
-                bgColor: '#1a1a2a',
+                bgColor: '#1a0a2a',
+                bgPattern: 'galaxy',
                 bulletSpeed: 12,
                 bulletDamage: 1,
-                specialRocketsUnlock: 3,
                 enemies: 5,
                 boss: false
             },
-            5: {
+            4: {
                 rocks: 30,
+                rockHealth: 6,
+                playerSpeed: 5,
+                bgColor: '#1a1a2a',
+                bgPattern: 'comet',
+                bulletSpeed: 12,
+                bulletDamage: 1,
+                enemies: 6,
+                boss: true,
+                bossType: 'alien'
+            },
+            5: {
+                rocks: 35,
                 rockHealth: 7,
                 playerSpeed: 5,
                 bgColor: '#2a0a1a',
+                bgPattern: 'asteroidField',
                 bulletSpeed: 12,
                 bulletDamage: 1,
-                specialRocketsUnlock: 3,
-                enemies: 6,
+                enemies: 7,
                 boss: false
+            },
+            6: {
+                rocks: 40,
+                rockHealth: 8,
+                playerSpeed: 5,
+                bgColor: '#2a1a0a',
+                bgPattern: 'blackHole',
+                bulletSpeed: 12,
+                bulletDamage: 1,
+                enemies: 8,
+                boss: true,
+                bossType: 'alien'
             }
         };
         
@@ -667,23 +876,20 @@
         const powerUpTypes = {
             shield: { 
                 color: '#00aaff', 
-                duration: 10000,
                 effect: 'Scudo attivo!'
             },
             rapidFire: { 
                 color: '#ffaa00', 
-                duration: 8000,
                 effect: 'Fuoco rapido!'
             },
             doublePoints: { 
                 color: '#00ff00', 
-                duration: 12000,
                 effect: 'Punti doppi!'
             },
             freeze: { 
                 color: '#00ffff', 
-                duration: 6000,
-                effect: 'Nemici congelati!'
+                effect: 'Nemici congelati!',
+                duration: 4000 // 4 secondi
             }
         };
 
@@ -703,13 +909,10 @@
                 this.shootCooldown = 0;
                 this.specialCooldown = 0;
                 this.shieldActive = false;
-                this.shieldTime = 0;
                 this.rapidFire = false;
-                this.rapidFireTime = 0;
                 this.doublePoints = false;
-                this.doublePointsTime = 0;
                 this.freezeEnemies = false;
-                this.freezeTime = 0;
+                this.freezeTimeout = null;
                 this.dashCooldown = 0;
                 this.piercingShots = this.config.special === 'piercing';
             }
@@ -852,8 +1055,6 @@
                     this.y += moveSpeed;
                 }
                 
-                this.updatePowerUps();
-                
                 if (this.shootCooldown > 0) {
                     this.shootCooldown--;
                 }
@@ -868,45 +1069,16 @@
                     this.shootCooldown = Math.max(5, Math.floor(baseCooldown));
                 }
                 
-                if ((keys['a'] || keys['A']) && specialRockets > 0) {
+                if ((keys['v'] || keys['V']) && specialRockets > 0) {
                     this.shootSpecial();
-                    keys['a'] = false;
-                    keys['A'] = false;
-                }
-            }
-            
-            updatePowerUps() {
-                if (this.shieldActive) {
-                    this.shieldTime--;
-                    if (this.shieldTime <= 0) {
-                        this.shieldActive = false;
-                        powerUpIndicator.style.display = 'none';
-                    }
-                }
-                
-                if (this.rapidFire) {
-                    this.rapidFireTime--;
-                    if (this.rapidFireTime <= 0) {
-                        this.rapidFire = false;
-                    }
-                }
-                
-                if (this.doublePoints) {
-                    this.doublePointsTime--;
-                    if (this.doublePointsTime <= 0) {
-                        this.doublePoints = false;
-                    }
-                }
-                
-                if (this.freezeEnemies) {
-                    this.freezeTime--;
-                    if (this.freezeTime <= 0) {
-                        this.freezeEnemies = false;
-                    }
+                    keys['v'] = false;
+                    keys['V'] = false;
                 }
             }
             
             shoot() {
+                createShootSound();
+                
                 const bulletConfig = levels[currentLevel];
                 
                 // Armi basate sul livello della nave
@@ -945,19 +1117,26 @@
                 switch(type) {
                     case 'shield':
                         this.shieldActive = true;
-                        this.shieldTime = powerUp.duration / 16.67;
                         break;
                     case 'rapidFire':
                         this.rapidFire = true;
-                        this.rapidFireTime = powerUp.duration / 16.67;
                         break;
                     case 'doublePoints':
                         this.doublePoints = true;
-                        this.doublePointsTime = powerUp.duration / 16.67;
                         break;
                     case 'freeze':
                         this.freezeEnemies = true;
-                        this.freezeTime = powerUp.duration / 16.67;
+                        createFreezeSound();
+                        
+                        // Clear any existing freeze timeout
+                        if (this.freezeTimeout) {
+                            clearTimeout(this.freezeTimeout);
+                        }
+                        
+                        // Set timeout to disable freeze after 4 seconds
+                        this.freezeTimeout = setTimeout(() => {
+                            this.freezeEnemies = false;
+                        }, powerUpTypes.freeze.duration);
                         break;
                 }
                 
@@ -1096,6 +1275,8 @@
             }
             
             explode() {
+                createExplosionSound();
+                
                 for (let i = 0; i < 50; i++) {
                     particles.push(new Particle(
                         this.x, 
@@ -1154,7 +1335,15 @@
                     }
                 }
                 
-                checkSpecialRocketsUnlock();
+                if (boss && boss.health > 0) {
+                    const dx = boss.x - this.x;
+                    const dy = boss.y - this.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < explosionRadius + boss.radius) {
+                        boss.takeDamage(10);
+                    }
+                }
             }
         }
 
@@ -1221,11 +1410,13 @@
             takeDamage(damage) {
                 this.health -= damage;
                 if (this.health <= 0) {
+                    createExplosionSound();
+                    
                     if (Math.random() < 0.2) {
                         this.dropPowerUp();
                     }
                     if (Math.random() < 0.3) {
-                        this.dropBitcoin();
+                        this.dropGold();
                     }
                     return true;
                 }
@@ -1238,21 +1429,22 @@
                 powerUps.push(new PowerUp(this.x, this.y, randomType));
             }
             
-            dropBitcoin() {
-                bitcoins.push(new Bitcoin(this.x, this.y));
+            dropGold() {
+                golds.push(new Gold(this.x, this.y));
             }
         }
 
-        // ========== BITCOIN CLASS ==========
-        class Bitcoin {
+        // ========== GOLD CLASS ==========
+        class Gold {
             constructor(x, y) {
                 this.x = x;
                 this.y = y;
-                this.radius = 10;
+                this.radius = 8;
                 this.speed = 2;
-                this.color = '#FF9900';
-                this.value = 0.5;
+                this.color = '#FFD700';
+                this.value = 1;
                 this.rotation = 0;
+                this.size = 8 + Math.random() * 4; // Dimensioni variabili per aspetto grezzo
             }
             
             draw() {
@@ -1260,23 +1452,49 @@
                 ctx.translate(this.x, this.y);
                 ctx.rotate(this.rotation);
                 
+                // Disegna una forma irregolare simile a un pezzetto d'oro grezzo
                 ctx.fillStyle = this.color;
                 ctx.beginPath();
-                ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                
+                // Crea una forma irregolare con punti casuali
+                const points = 6 + Math.floor(Math.random() * 3); // 6-8 punti per forma irregolare
+                for (let i = 0; i < points; i++) {
+                    const angle = (i / points) * Math.PI * 2;
+                    const radius = this.size * (0.7 + Math.random() * 0.3); // Raggio variabile
+                    const x = Math.cos(angle) * radius;
+                    const y = Math.sin(angle) * radius;
+                    
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                
+                ctx.closePath();
                 ctx.fill();
                 
-                ctx.fillStyle = '#000000';
-                ctx.font = 'bold 12px Arial';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('₿', 0, 0);
+                // Aggiungi dettagli per renderlo più realistico
+                ctx.fillStyle = '#FFA500';
+                ctx.beginPath();
+                for (let i = 0; i < 3; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const radius = this.size * (0.3 + Math.random() * 0.2);
+                    const x = Math.cos(angle) * radius;
+                    const y = Math.sin(angle) * radius;
+                    const smallRadius = this.size * 0.2;
+                    
+                    ctx.moveTo(x, y);
+                    ctx.arc(x, y, smallRadius, 0, Math.PI * 2);
+                }
+                ctx.fill();
                 
                 ctx.restore();
             }
             
             update() {
                 this.y += this.speed;
-                this.rotation += 0.1;
+                this.rotation += 0.05;
                 return this.y > canvas.height;
             }
         }
@@ -1383,6 +1601,164 @@
             }
         }
 
+        // ========== BOSS CLASS ==========
+        class Boss {
+            constructor(type) {
+                this.type = type || 'alien';
+                this.radius = 60;
+                this.x = canvas.width / 2;
+                this.y = 100;
+                this.health = 50;
+                this.maxHealth = this.health;
+                this.speedX = 2;
+                this.speedY = 1;
+                this.color = '#ff0000';
+                this.shootCooldown = 0;
+                this.attackCooldown = 0;
+                this.frozen = false;
+                this.bullets = [];
+            }
+            
+            draw() {
+                ctx.fillStyle = this.frozen ? '#aaccff' : this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = this.frozen ? '#88aadd' : '#aa0000';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius * 0.7, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#ff5500';
+                ctx.beginPath();
+                ctx.arc(this.x - this.radius * 0.4, this.y, this.radius * 0.2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(this.x + this.radius * 0.4, this.y, this.radius * 0.2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                const barWidth = 200;
+                const barHeight = 10;
+                const barX = this.x - barWidth / 2;
+                const barY = this.y - this.radius - 20;
+                
+                ctx.fillStyle = '#333333';
+                ctx.fillRect(barX, barY, barWidth, barHeight);
+                
+                ctx.fillStyle = this.health > this.maxHealth / 2 ? '#00ff00' : '#ff0000';
+                ctx.fillRect(barX, barY, barWidth * (this.health / this.maxHealth), barHeight);
+                
+                // Draw boss name
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('BOSS', this.x, this.y);
+            }
+            
+            update() {
+                if (player.freezeEnemies) {
+                    this.frozen = true;
+                    return;
+                }
+                
+                this.frozen = false;
+                
+                this.x += this.speedX;
+                this.y += this.speedY;
+                
+                if (this.x < this.radius || this.x > canvas.width - this.radius) {
+                    this.speedX *= -1;
+                }
+                if (this.y < this.radius || this.y > canvas.height / 3) {
+                    this.speedY *= -1;
+                }
+                
+                if (this.shootCooldown > 0) {
+                    this.shootCooldown--;
+                } else {
+                    this.shoot();
+                    this.shootCooldown = 60;
+                }
+                
+                if (this.attackCooldown > 0) {
+                    this.attackCooldown--;
+                } else {
+                    this.specialAttack();
+                    this.attackCooldown = 180;
+                }
+                
+                // Update boss bullets
+                for (let i = this.bullets.length - 1; i >= 0; i--) {
+                    if (this.bullets[i].update()) {
+                        this.bullets.splice(i, 1);
+                    }
+                }
+            }
+            
+            shoot() {
+                this.bullets.push(new BossBullet(this.x, this.y, -Math.PI/2));
+                this.bullets.push(new BossBullet(this.x, this.y, -Math.PI/2 - 0.3));
+                this.bullets.push(new BossBullet(this.x, this.y, -Math.PI/2 + 0.3));
+            }
+            
+            specialAttack() {
+                for (let i = 0; i < 8; i++) {
+                    this.bullets.push(new BossBullet(this.x, this.y, -Math.PI/2 + (i * Math.PI/4)));
+                }
+            }
+            
+            takeDamage(damage) {
+                this.health -= damage;
+                if (this.health <= 0) {
+                    addScore(200);
+                    for (let i = 0; i < 30; i++) {
+                        particles.push(new Particle(
+                            this.x, 
+                            this.y, 
+                            '#ff0000',
+                            3
+                        ));
+                    }
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        // ========== BOSS BULLET CLASS ==========
+        class BossBullet {
+            constructor(x, y, angle) {
+                this.x = x;
+                this.y = y;
+                this.radius = 8;
+                this.speed = 5;
+                this.angle = angle;
+                this.speedX = Math.sin(this.angle) * this.speed;
+                this.speedY = -Math.cos(this.angle) * this.speed;
+                this.color = '#ff5555';
+            }
+            
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius / 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                return this.y > canvas.height || this.x < 0 || this.x > canvas.width || this.y < 0;
+            }
+        }
+
         // ========== POWER-UP CLASS ==========
         class PowerUp {
             constructor(x, y, type) {
@@ -1430,16 +1806,41 @@
 
         // ========== STAR CLASS ==========
         class Star {
-            constructor() {
+            constructor(pattern) {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
                 this.size = Math.random() * 2;
                 this.speed = Math.random() * 0.5;
                 this.brightness = Math.random();
+                this.pattern = pattern;
+                
+                // Different star colors based on pattern
+                switch(pattern) {
+                    case 'milkyWay':
+                        this.color = {r: 255, g: 255, b: 255};
+                        break;
+                    case 'nebula':
+                        this.color = {r: 200, g: 150, b: 255};
+                        break;
+                    case 'galaxy':
+                        this.color = {r: 255, g: 200, b: 100};
+                        break;
+                    case 'comet':
+                        this.color = {r: 150, g: 200, b: 255};
+                        break;
+                    case 'asteroidField':
+                        this.color = {r: 255, g: 150, b: 150};
+                        break;
+                    case 'blackHole':
+                        this.color = {r: 100, g: 100, b: 255};
+                        break;
+                    default:
+                        this.color = {r: 255, g: 255, b: 255};
+                }
             }
             
             draw() {
-                ctx.fillStyle = `rgba(255, 255, 255, ${this.brightness})`;
+                ctx.fillStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.brightness})`;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fill();
@@ -1491,25 +1892,34 @@
             if (multiplier > 1) actualPoints *= multiplier;
             
             score += actualPoints;
-            scoreDisplay.textContent = `PUNTEGGIO: ${score}`;
+            scoreDisplay.textContent = `PUNTI: ${score}`;
         }
 
-        function addBitcoin(value = 0.5) {
+        function addGold(value = 1) {
             const oldShipLevel = shipLevel;
             
-            bitcoinCount += value;
-            bitcoinEarnedThisLevel += value;
+            goldCount += value;
+            goldEarnedThisLevel += value;
             
-            // Calcola il nuovo livello della nave (ogni 10 BTC)
-            shipLevel = Math.min(3, Math.floor(bitcoinCount / 10) + 1);
+            // Calcola il nuovo livello della nave (ogni 10 GOLD)
+            shipLevel = Math.min(3, Math.floor(goldCount / 10) + 1);
             
-            bitcoinDisplay.textContent = `BITCOIN: ${Math.floor(bitcoinCount)}`;
+            goldDisplay.textContent = `GOLD: ${Math.floor(goldCount)}`;
             
-            bitcoinIndicator.textContent = `+${value} BITCOIN!`;
-            bitcoinIndicator.style.display = 'block';
+            // Aggiungi un razzo ogni 2 monete d'oro
+            if (Math.floor(goldCount) % 2 === 0 && Math.floor(goldCount) > 0) {
+                specialRockets++;
+                specialWeaponDisplay.textContent = `RAZZI: ${specialRockets}`;
+            }
+            
+            // Riproduci suono moneta
+            createMoneySound();
+            
+            goldIndicator.textContent = `+${value} GOLD!`;
+            goldIndicator.style.display = 'block';
             
             setTimeout(() => {
-                bitcoinIndicator.style.display = 'none';
+                goldIndicator.style.display = 'none';
             }, 2000);
             
             // Mostra notifica evoluzione se il livello è cambiato
@@ -1541,28 +1951,93 @@
             }, 3000);
         }
 
-        function checkSpecialRocketsUnlock() {
-            const rocksNeeded = levels[currentLevel].specialRocketsUnlock;
-            if (rocksDestroyed >= rocksNeeded && specialRockets < 3) {
-                specialRockets++;
-                rocksDestroyed = 0;
-                specialWeaponDisplay.textContent = `RAZZI: ${specialRockets}`;
-                
-                for (let i = 0; i < 20; i++) {
-                    particles.push(new Particle(
-                        canvas.width - 50, 
-                        30, 
-                        '#ff5500',
-                        2
-                    ));
-                }
+        function drawBackground() {
+            const levelConfig = levels[currentLevel];
+            
+            // Draw gradient background
+            const gradient = ctx.createRadialGradient(
+                canvas.width / 2, canvas.height / 2, 0,
+                canvas.width / 2, canvas.height / 2, Math.max(canvas.width, canvas.height)
+            );
+            
+            switch(levelConfig.bgPattern) {
+                case 'milkyWay':
+                    gradient.addColorStop(0, '#0a0a2a');
+                    gradient.addColorStop(1, '#000011');
+                    break;
+                case 'nebula':
+                    gradient.addColorStop(0, '#1a0a3a');
+                    gradient.addColorStop(1, '#0a0a2a');
+                    break;
+                case 'galaxy':
+                    gradient.addColorStop(0, '#2a0a1a');
+                    gradient.addColorStop(1, '#0a0a2a');
+                    break;
+                case 'comet':
+                    gradient.addColorStop(0, '#0a2a2a');
+                    gradient.addColorStop(1, '#001122');
+                    break;
+                case 'asteroidField':
+                    gradient.addColorStop(0, '#2a2a0a');
+                    gradient.addColorStop(1, '#111100');
+                    break;
+                case 'blackHole':
+                    gradient.addColorStop(0, '#000000');
+                    gradient.addColorStop(1, '#0a0a1a');
+                    break;
+                default:
+                    gradient.addColorStop(0, levelConfig.bgColor);
+                    gradient.addColorStop(1, '#000011');
             }
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw special background elements based on pattern
+            switch(levelConfig.bgPattern) {
+                case 'milkyWay':
+                    // Draw a milky way streak
+                    ctx.fillStyle = 'rgba(100, 100, 200, 0.1)';
+                    ctx.beginPath();
+                    ctx.ellipse(canvas.width / 2, canvas.height / 2, canvas.width * 0.8, canvas.height * 0.1, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    break;
+                case 'nebula':
+                    // Draw nebula clouds
+                    ctx.fillStyle = 'rgba(150, 100, 200, 0.1)';
+                    ctx.beginPath();
+                    ctx.arc(canvas.width * 0.3, canvas.height * 0.3, canvas.width * 0.2, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = 'rgba(200, 100, 150, 0.1)';
+                    ctx.beginPath();
+                    ctx.arc(canvas.width * 0.7, canvas.height * 0.7, canvas.width * 0.15, 0, Math.PI * 2);
+                    ctx.fill();
+                    break;
+                case 'galaxy':
+                    // Draw spiral galaxy
+                    ctx.strokeStyle = 'rgba(200, 150, 100, 0.1)';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    for (let i = 0; i < 3; i++) {
+                        ctx.ellipse(canvas.width / 2, canvas.height / 2, canvas.width * (0.2 + i * 0.1), canvas.height * (0.05 + i * 0.05), Math.PI / 4, 0, Math.PI * 2);
+                    }
+                    ctx.stroke();
+                    break;
+            }
+            
+            // Draw stars
+            stars.forEach(star => {
+                star.draw();
+            });
         }
 
         function checkCollisions() {
+            // Check collisions with bullets
             for (let i = bullets.length - 1; i >= 0; i--) {
                 let bulletHit = false;
                 
+                // Check collisions with rocks
                 for (let j = rocks.length - 1; j >= 0; j--) {
                     const dx = bullets[i].x - rocks[j].x;
                     const dy = bullets[i].y - rocks[j].y;
@@ -1597,6 +2072,7 @@
                 }
                 
                 if (!bulletHit) {
+                    // Check collisions with enemies
                     for (let j = enemies.length - 1; j >= 0; j--) {
                         const dx = bullets[i].x - enemies[j].x;
                         const dy = bullets[i].y - enemies[j].y;
@@ -1627,8 +2103,49 @@
                         }
                     }
                 }
+                
+                // Check collision with boss
+                if (!bulletHit && boss && boss.health > 0) {
+                    const dx = bullets[i].x - boss.x;
+                    const dy = bullets[i].y - boss.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < bullets[i].width / 2 + boss.radius) {
+                        if (boss.takeDamage(bullets[i].damage)) {
+                            boss = null;
+                            bossWarning.style.display = 'none';
+                        }
+                        
+                        if (!bullets[i].piercing || bullets[i].penetrated >= 2) {
+                            bullets.splice(i, 1);
+                        } else {
+                            bullets[i].penetrated++;
+                        }
+                    }
+                }
+                
+                // Check collision with boss bullets
+                if (!bulletHit && boss && boss.health > 0) {
+                    for (let j = boss.bullets.length - 1; j >= 0; j--) {
+                        const dx = bullets[i].x - boss.bullets[j].x;
+                        const dy = bullets[i].y - boss.bullets[j].y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < bullets[i].width / 2 + boss.bullets[j].radius) {
+                            boss.bullets.splice(j, 1);
+                            
+                            if (!bullets[i].piercing || bullets[i].penetrated >= 2) {
+                                bullets.splice(i, 1);
+                                break;
+                            } else {
+                                bullets[i].penetrated++;
+                            }
+                        }
+                    }
+                }
             }
             
+            // Check collisions with special rockets
             for (let i = specialRocketsArray.length - 1; i >= 0; i--) {
                 const rocket = specialRocketsArray[i];
                 
@@ -1644,11 +2161,40 @@
                     }
                 }
                 
-                if (rocket.update()) {
+                if (i >= specialRocketsArray.length) continue;
+                
+                for (let j = enemies.length - 1; j >= 0; j--) {
+                    const dx = rocket.x - enemies[j].x;
+                    const dy = rocket.y - enemies[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < rocket.width / 2 + enemies[j].radius) {
+                        rocket.explode();
+                        specialRocketsArray.splice(i, 1);
+                        break;
+                    }
+                }
+                
+                if (i >= specialRocketsArray.length) continue;
+                
+                if (boss && boss.health > 0) {
+                    const dx = rocket.x - boss.x;
+                    const dy = rocket.y - boss.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < rocket.width / 2 + boss.radius) {
+                        rocket.explode();
+                        specialRocketsArray.splice(i, 1);
+                        break;
+                    }
+                }
+                
+                if (i < specialRocketsArray.length && rocket.update()) {
                     specialRocketsArray.splice(i, 1);
                 }
             }
             
+            // Check collisions with rocks
             for (let i = rocks.length - 1; i >= 0; i--) {
                 const rock = rocks[i];
                 const dx = player.x + player.width/2 - rock.x;
@@ -1660,6 +2206,7 @@
                 }
             }
             
+            // Check collisions with power-ups
             for (let i = powerUps.length - 1; i >= 0; i--) {
                 const powerUp = powerUps[i];
                 const dx = player.x + player.width/2 - powerUp.x;
@@ -1674,20 +2221,22 @@
                 }
             }
             
-            for (let i = bitcoins.length - 1; i >= 0; i--) {
-                const bitcoin = bitcoins[i];
-                const dx = player.x + player.width/2 - bitcoin.x;
-                const dy = player.y + player.height/2 - bitcoin.y;
+            // Check collisions with gold
+            for (let i = golds.length - 1; i >= 0; i--) {
+                const gold = golds[i];
+                const dx = player.x + player.width/2 - gold.x;
+                const dy = player.y + player.height/2 - gold.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
                 
-                if (distance < player.width/2 + bitcoin.radius) {
-                    addBitcoin(bitcoin.value);
-                    bitcoins.splice(i, 1);
-                } else if (bitcoin.update()) {
-                    bitcoins.splice(i, 1);
+                if (distance < player.width/2 + gold.radius) {
+                    addGold(gold.value);
+                    golds.splice(i, 1);
+                } else if (gold.update()) {
+                    golds.splice(i, 1);
                 }
             }
             
+            // Check collisions with enemies
             for (let i = enemies.length - 1; i >= 0; i--) {
                 const enemy = enemies[i];
                 const dx = player.x + player.width/2 - enemy.x;
@@ -1698,10 +2247,36 @@
                     player.takeDamage(15);
                 }
             }
+            
+            // Check collision with boss bullets
+            if (boss && boss.health > 0) {
+                for (let i = boss.bullets.length - 1; i >= 0; i--) {
+                    const bullet = boss.bullets[i];
+                    const dx = player.x + player.width/2 - bullet.x;
+                    const dy = player.y + player.height/2 - bullet.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < player.width/2 + bullet.radius) {
+                        player.takeDamage(20);
+                        boss.bullets.splice(i, 1);
+                    }
+                }
+            }
+            
+            // Check collision with boss
+            if (boss && boss.health > 0) {
+                const dx = player.x + player.width/2 - boss.x;
+                const dy = player.y + player.height/2 - boss.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < player.width/2 + boss.radius) {
+                    player.takeDamage(30);
+                }
+            }
         }
 
         function checkLevelComplete() {
-            if (rocks.length === 0 && enemies.length === 0) {
+            if (rocks.length === 0 && enemies.length === 0 && (!boss || boss.health <= 0)) {
                 levelComplete();
             }
         }
@@ -1770,29 +2345,43 @@
             rocks = [];
             enemies = [];
             powerUps = [];
-            bitcoins = [];
+            golds = [];
             particles = [];
+            boss = null;
             rocksDestroyed = 0;
-            bitcoinEarnedThisLevel = 0;
+            goldEarnedThisLevel = 0;
             
-            for (let i = 0; i < levels[currentLevel].rocks; i++) {
+            const levelConfig = levels[currentLevel];
+            
+            for (let i = 0; i < levelConfig.rocks; i++) {
                 rocks.push(new Rock());
             }
             
-            for (let i = 0; i < levels[currentLevel].enemies; i++) {
+            for (let i = 0; i < levelConfig.enemies; i++) {
                 enemies.push(new Enemy());
             }
             
+            // Add boss for even levels
+            if (levelConfig.boss) {
+                setTimeout(() => {
+                    bossWarning.style.display = 'block';
+                    setTimeout(() => {
+                        bossWarning.style.display = 'none';
+                        boss = new Boss(levelConfig.bossType);
+                    }, 2000);
+                }, 3000);
+            }
+            
             stars = [];
-            for (let i = 0; i < 100; i++) {
-                stars.push(new Star());
+            for (let i = 0; i < 150; i++) {
+                stars.push(new Star(levelConfig.bgPattern));
             }
             
             levelIndicator.textContent = `LIVELLO: ${currentLevel}`;
-            scoreDisplay.textContent = `PUNTEGGIO: ${score}`;
+            scoreDisplay.textContent = `PUNTI: ${score}`;
             specialWeaponDisplay.textContent = `RAZZI: ${specialRockets}`;
             comboDisplay.textContent = `COMBO: ${multiplier}x`;
-            bitcoinDisplay.textContent = `BITCOIN: ${Math.floor(bitcoinCount)}`;
+            goldDisplay.textContent = `GOLD: ${Math.floor(goldCount)}`;
             
             updateShipEvolutionDisplay();
         }
@@ -1811,12 +2400,10 @@
         function gameLoop() {
             if (!gameActive) return;
             
-            ctx.fillStyle = levels[currentLevel].bgColor;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            drawBackground();
             
             stars.forEach(star => {
                 star.update();
-                star.draw();
             });
             
             player.update();
@@ -1848,12 +2435,22 @@
                 enemy.draw();
             });
             
+            if (boss && boss.health > 0) {
+                boss.update();
+                boss.draw();
+                
+                // Draw boss bullets
+                boss.bullets.forEach(bullet => {
+                    bullet.draw();
+                });
+            }
+            
             powerUps.forEach(powerUp => {
                 powerUp.draw();
             });
             
-            bitcoins.forEach(bitcoin => {
-                bitcoin.draw();
+            golds.forEach(gold => {
+                gold.draw();
             });
             
             for (let i = particles.length - 1; i >= 0; i--) {
@@ -1883,16 +2480,16 @@
         function levelComplete() {
             gameActive = false;
             
-            document.getElementById('level-bitcoin-earned').textContent = Math.floor(bitcoinEarnedThisLevel);
-            document.getElementById('total-bitcoin-after-level').textContent = Math.floor(bitcoinCount);
+            document.getElementById('level-gold-earned').textContent = Math.floor(goldEarnedThisLevel);
+            document.getElementById('total-gold-after-level').textContent = Math.floor(goldCount);
             
             currentLevel++;
             
-            if (currentLevel > 5) {
+            if (currentLevel > 6) {
                 levelCompleteText.textContent = `Congratulazioni! Hai completato tutti i livelli! Punteggio finale: ${score}`;
                 currentLevel = 1;
                 score = 0;
-                bitcoinCount = 0;
+                goldCount = 0;
                 shipLevel = 1;
             }
             
@@ -1902,7 +2499,7 @@
         function gameOver() {
             gameActive = false;
             
-            document.getElementById('gameover-bitcoin-earned').textContent = Math.floor(bitcoinEarnedThisLevel);
+            document.getElementById('gameover-gold-earned').textContent = Math.floor(goldEarnedThisLevel);
             document.getElementById('gameover-score').textContent = score;
             
             if (score > gameData.highScore) {
@@ -1924,8 +2521,8 @@
             currentLevel = 1;
             score = 0;
             specialRockets = 0;
-            bitcoinCount = 0;
-            bitcoinEarnedThisLevel = 0;
+            goldCount = 0;
+            goldEarnedThisLevel = 0;
             shipLevel = 1;
             startGame();
         }
