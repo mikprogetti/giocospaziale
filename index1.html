@@ -1,0 +1,2587 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Gold Mission</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(to bottom, #0a0a2a, #1a1a4a);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+        
+        #game-container {
+            position: relative;
+            width: min(95vw, 800px);
+            height: min(80vh, 600px);
+            border: 2px solid #4a9eff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(74, 158, 255, 0.5);
+        }
+        
+        #game-canvas {
+            background: radial-gradient(circle at center, #0a0a2a, #000011);
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        #ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 8px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+            font-size: min(2.2vw, 14px);
+        }
+        
+        .ui-panel {
+            background: rgba(10, 10, 42, 0.8);
+            padding: 5px 8px;
+            border-radius: 5px;
+            border: 1px solid #4a9eff;
+            margin: 0 2px;
+        }
+        
+        #level-indicator {
+            font-weight: bold;
+            color: #4a9eff;
+        }
+        
+        #score-display {
+            font-weight: bold;
+            color: #ffcc00;
+        }
+        
+        #special-weapon {
+            font-weight: bold;
+            color: #ff5500;
+        }
+        
+        #combo-display {
+            font-weight: bold;
+            color: #ff00cc;
+        }
+        
+        #gold-display {
+            font-weight: bold;
+            color: #FFD700;
+        }
+        
+        #start-screen, #level-complete, #game-over, #mission-screen, #ship-select-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 20, 0.9);
+            z-index: 10;
+            padding: 15px;
+            text-align: center;
+            overflow-y: auto;
+        }
+        
+        #level-complete, #game-over, #mission-screen, #ship-select-screen {
+            display: none;
+        }
+        
+        h1 {
+            font-size: min(6vw, 36px);
+            margin-bottom: 10px;
+            color: #4a9eff;
+            text-shadow: 0 0 10px rgba(74, 158, 255, 0.7);
+            line-height: 1.2;
+        }
+        
+        h2 {
+            font-size: min(5vw, 28px);
+            margin-bottom: 10px;
+            color: #ffcc00;
+            line-height: 1.2;
+        }
+        
+        p {
+            font-size: min(3.5vw, 16px);
+            margin-bottom: 12px;
+            text-align: center;
+            max-width: 95%;
+            line-height: 1.4;
+        }
+        
+        .btn {
+            background: linear-gradient(to bottom, #4a9eff, #2a5aaa);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: min(3.5vw, 16px);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 15px rgba(74, 158, 255, 0.5);
+            margin: 4px;
+            min-width: 130px;
+        }
+        
+        .btn:hover {
+            background: linear-gradient(to bottom, #5aaeff, #3a6aba);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(74, 158, 255, 0.7);
+        }
+        
+        .btn-ship {
+            background: linear-gradient(to bottom, #ffcc00, #ff8800);
+        }
+        
+        .btn-ship:hover {
+            background: linear-gradient(to bottom, #ffdd44, #ffaa44);
+        }
+        
+        .controls-info {
+            margin-top: 12px;
+            background: rgba(74, 158, 255, 0.2);
+            padding: 8px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 95%;
+        }
+        
+        .controls-info h3 {
+            margin-bottom: 6px;
+            color: #ffcc00;
+            font-size: min(3.5vw, 16px);
+        }
+        
+        .upgrade-info {
+            margin-top: 10px;
+            background: rgba(255, 204, 0, 0.2);
+            padding: 8px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 95%;
+        }
+        
+        .upgrade-info h3 {
+            color: #ffcc00;
+            margin-bottom: 4px;
+            font-size: min(3.5vw, 16px);
+        }
+        
+        .ship-evolution {
+            display: flex;
+            justify-content: center;
+            margin: 12px 0;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .ship-stage {
+            text-align: center;
+            margin: 0 4px;
+        }
+        
+        .ship-stage.active {
+            transform: scale(1.1);
+        }
+        
+        .ship-icon {
+            width: 35px;
+            height: 45px;
+            margin: 0 auto 4px;
+            background: linear-gradient(to bottom, #4a9eff, #2a5aaa);
+            clip-path: polygon(50% 0%, 100% 30%, 80% 100%, 20% 100%, 0% 30%);
+        }
+        
+        .ship-stage.active .ship-icon {
+            background: linear-gradient(to bottom, #ffcc00, #ff8800);
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.7);
+        }
+        
+        .power-up-indicator {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 255, 0, 0.7);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            display: none;
+            z-index: 5;
+        }
+        
+        .mission-info {
+            background: rgba(255, 204, 0, 0.2);
+            padding: 8px;
+            border-radius: 10px;
+            margin: 6px 0;
+            text-align: center;
+            max-width: 95%;
+        }
+        
+        .achievement-popup {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid #ffcc00;
+            text-align: center;
+            z-index: 100;
+            display: none;
+            max-width: 80%;
+        }
+        
+        .ship-option {
+            display: inline-block;
+            margin: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 6px;
+        }
+        
+        .ship-option:hover {
+            transform: scale(1.05);
+        }
+        
+        .ship-option.selected {
+            border: 2px solid #ffcc00;
+            border-radius: 10px;
+            padding: 6px;
+        }
+        
+        .ship-preview {
+            width: 45px;
+            height: 60px;
+            margin: 0 auto 4px;
+            background: linear-gradient(to bottom, #4a9eff, #2a5aaa);
+            clip-path: polygon(50% 0%, 100% 30%, 80% 100%, 20% 100%, 0% 30%);
+        }
+        
+        .ship-speedster .ship-preview {
+            background: linear-gradient(to bottom, #00ffcc, #00aa88);
+        }
+        
+        .ship-tank .ship-preview {
+            background: linear-gradient(to bottom, #ff5555, #aa2222);
+        }
+        
+        .ship-sniper .ship-preview {
+            background: linear-gradient(to bottom, #cc00ff, #8800aa);
+        }
+        
+        #debug-info {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 9px;
+            display: none;
+        }
+        
+        .gold-indicator {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 215, 0, 0.7);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            display: none;
+            z-index: 5;
+        }
+
+        .evolution-notification {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid #ffcc00;
+            text-align: center;
+            z-index: 90;
+            display: none;
+            max-width: 80%;
+        }
+
+        .gold-summary {
+            background: rgba(255, 215, 0, 0.2);
+            padding: 8px;
+            border-radius: 10px;
+            margin: 8px 0;
+            font-size: min(3.5vw, 16px);
+        }
+
+        .rocket-info {
+            background: rgba(255, 85, 0, 0.2);
+            padding: 8px;
+            border-radius: 10px;
+            margin: 8px 0;
+            font-size: min(3.5vw, 16px);
+        }
+
+        .boss-warning {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #ff0000;
+            text-align: center;
+            z-index: 95;
+            display: none;
+            max-width: 80%;
+            animation: pulse 1s infinite;
+        }
+
+        #sound-toggle {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(10, 10, 42, 0.8);
+            border: 1px solid #4a9eff;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        #sound-toggle:hover {
+            background: rgba(74, 158, 255, 0.8);
+        }
+
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.05); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        @media (max-height: 700px) {
+            #game-container {
+                height: 90vh;
+            }
+            
+            .btn {
+                padding: 6px 12px;
+                min-width: 110px;
+            }
+            
+            h1 {
+                font-size: min(5vw, 28px);
+            }
+            
+            h2 {
+                font-size: min(4.5vw, 24px);
+            }
+        }
+
+        @media (max-width: 600px) {
+            #ui-overlay {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .ui-panel {
+                margin: 2px;
+                padding: 4px 6px;
+            }
+            
+            .ship-option {
+                margin: 4px;
+            }
+            
+            .ship-preview {
+                width: 40px;
+                height: 55px;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .ship-evolution {
+                gap: 5px;
+            }
+            
+            .ship-stage {
+                margin: 0 2px;
+            }
+            
+            .ship-icon {
+                width: 30px;
+                height: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+        
+        <div id="ui-overlay">
+            <div class="ui-panel">
+                <div id="level-indicator">LIVELLO: 1</div>
+            </div>
+            <div class="ui-panel">
+                <div id="score-display">PUNTI: 0</div>
+            </div>
+            <div class="ui-panel">
+                <div id="special-weapon">RAZZI: 0</div>
+            </div>
+            <div class="ui-panel">
+                <div id="combo-display">COMBO: 1x</div>
+            </div>
+            <div class="ui-panel">
+                <div id="gold-display">GOLD: 0</div>
+            </div>
+        </div>
+        
+        <button id="sound-toggle">🔊</button>
+        
+        <div id="power-up-indicator" class="power-up-indicator"></div>
+        <div id="gold-indicator" class="gold-indicator">+1 GOLD!</div>
+        <div id="evolution-notification" class="evolution-notification">
+            <h3>NAVICELLA EVOLUTA!</h3>
+            <p id="evolution-details">La tua navicella ha raggiunto un nuovo livello!</p>
+        </div>
+        <div id="boss-warning" class="boss-warning">
+            <h3>BOSS IN ARRIVO!</h3>
+            <p>Preparati ad affrontare un potente nemico!</p>
+        </div>
+        <div id="debug-info"></div>
+        
+        <div id="start-screen">
+            <h1>MISSIONE SPAZIALE GOLD</h1>
+            <p>Distruggi gli asteroidi, raccogli monete d'oro e fai evolvere la tua navicella!</p>
+            
+            <div class="ship-evolution">
+                <div class="ship-stage">
+                    <div class="ship-icon"></div>
+                    <div>LIVELLO 1</div>
+                    <div>0-9 GOLD</div>
+                </div>
+                <div class="ship-stage">
+                    <div class="ship-icon"></div>
+                    <div>LIVELLO 2</div>
+                    <div>10-19 GOLD</div>
+                </div>
+                <div class="ship-stage">
+                    <div class="ship-icon"></div>
+                    <div>LIVELLO 3</div>
+                    <div>20+ GOLD</div>
+                </div>
+            </div>
+            
+            <button id="start-btn" class="btn">INIZIA MISSIONE</button>
+            <button id="select-ship-btn" class="btn btn-ship">SELEZIONA NAVICELLA</button>
+            
+            <div class="rocket-info">
+                <h3>RAZZI SPECIALI</h3>
+                <p>Ottieni 1 razzo ogni 2 monete d'oro raccolte!</p>
+                <p>Premi <strong>V</strong> per sparare i razzi</p>
+            </div>
+            
+            <div class="controls-info">
+                <h3>CONTROLLI</h3>
+                <p>FRECCE: Muovi la navicella<br>SPAZIO: Sparare raggi<br>V: Razzi speciali</p>
+            </div>
+            
+            <div class="upgrade-info">
+                <h3>EVOLUZIONE AUTOMATICA</h3>
+                <p>La navicella si evolve automaticamente ogni 10 monete d'oro raccolte!</p>
+            </div>
+        </div>
+        
+        <div id="ship-select-screen">
+            <h2>SELEZIONA NAVICELLA</h2>
+            <div>
+                <div class="ship-option selected" data-ship="base">
+                    <div class="ship-preview"></div>
+                    <div>NAVICELLA BASE</div>
+                    <div>Equilibrata</div>
+                </div>
+                <div class="ship-option ship-speedster" data-ship="speedster">
+                    <div class="ship-preview"></div>
+                    <div>VELOCISTA</div>
+                    <div>+ Velocità</div>
+                </div>
+                <div class="ship-option ship-tank" data-ship="tank">
+                    <div class="ship-preview"></div>
+                    <div>CORAZZATA</div>
+                    <div>+ Resistenza</div>
+                </div>
+                <div class="ship-option ship-sniper" data-ship="sniper">
+                    <div class="ship-preview"></div>
+                    <div>CECCHINO</div>
+                    <div>+ Danno</div>
+                </div>
+            </div>
+            <button id="confirm-ship-btn" class="btn">CONFERMA</button>
+            <button id="back-to-menu-btn" class="btn">INDIETRO</button>
+        </div>
+        
+        <div id="mission-screen">
+            <h2>MISSIONE ATTIVA</h2>
+            <div id="mission-text" class="mission-info"></div>
+            <div id="mission-progress"></div>
+            <button id="start-mission-btn" class="btn">INIZIA MISSIONE</button>
+        </div>
+        
+        <div id="level-complete">
+            <h2>LIVELLO COMPLETATO!</h2>
+            <p id="level-complete-text">Ottimo lavoro! Passa al livello successivo.</p>
+            <div class="gold-summary">
+                <p>Monete d'oro raccolte: <span id="level-gold-earned">0</span></p>
+                <p>Monete d'oro totali: <span id="total-gold-after-level">0</span></p>
+            </div>
+            <button id="next-level-btn" class="btn">LIVELLO SUCCESSIVO</button>
+        </div>
+        
+        <div id="game-over">
+            <h2>MISSIONE FALLITA</h2>
+            <p id="game-over-text">La tua navicella è stata distrutta!</p>
+            <div class="gold-summary">
+                <p>Monete d'oro raccolte: <span id="gameover-gold-earned">0</span></p>
+                <p>Punteggio: <span id="gameover-score">0</span></p>
+            </div>
+            <button id="restart-btn" class="btn">RIPROVA</button>
+        </div>
+        
+        <div id="achievement-popup" class="achievement-popup">
+            <h3>OBBIETTIVO SBLOCCATO!</h3>
+            <p id="achievement-name"></p>
+            <p id="achievement-desc"></p>
+        </div>
+    </div>
+
+    <script>
+        // ========== CANVAS SETUP ==========
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            const container = document.getElementById('game-container');
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+        }
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // ========== GAME ELEMENTS ==========
+        const startScreen = document.getElementById('start-screen');
+        const levelCompleteScreen = document.getElementById('level-complete');
+        const gameOverScreen = document.getElementById('game-over');
+        const missionScreen = document.getElementById('mission-screen');
+        const shipSelectScreen = document.getElementById('ship-select-screen');
+        const startBtn = document.getElementById('start-btn');
+        const nextLevelBtn = document.getElementById('next-level-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const selectShipBtn = document.getElementById('select-ship-btn');
+        const confirmShipBtn = document.getElementById('confirm-ship-btn');
+        const backToMenuBtn = document.getElementById('back-to-menu-btn');
+        const startMissionBtn = document.getElementById('start-mission-btn');
+        const levelIndicator = document.getElementById('level-indicator');
+        const scoreDisplay = document.getElementById('score-display');
+        const specialWeaponDisplay = document.getElementById('special-weapon');
+        const comboDisplay = document.getElementById('combo-display');
+        const goldDisplay = document.getElementById('gold-display');
+        const levelCompleteText = document.getElementById('level-complete-text');
+        const gameOverText = document.getElementById('game-over-text');
+        const missionText = document.getElementById('mission-text');
+        const missionProgress = document.getElementById('mission-progress');
+        const powerUpIndicator = document.getElementById('power-up-indicator');
+        const goldIndicator = document.getElementById('gold-indicator');
+        const evolutionNotification = document.getElementById('evolution-notification');
+        const evolutionDetails = document.getElementById('evolution-details');
+        const bossWarning = document.getElementById('boss-warning');
+        const achievementPopup = document.getElementById('achievement-popup');
+        const achievementName = document.getElementById('achievement-name');
+        const achievementDesc = document.getElementById('achievement-desc');
+        const soundToggle = document.getElementById('sound-toggle');
+        
+        // ========== AUDIO SETUP ==========
+        let soundEnabled = true;
+        
+        // Funzione per generare suoni proceduralmente
+        function createShootSound() {
+            if (!soundEnabled) return;
+            
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.type = 'square';
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.1);
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.1);
+        }
+        
+        function createExplosionSound() {
+            if (!soundEnabled) return;
+            
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.type = 'sawtooth';
+            oscillator.frequency.setValueAtTime(150, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.5);
+            
+            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+        
+        function createMoneySound() {
+            if (!soundEnabled) return;
+            
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // Do
+            oscillator.frequency.exponentialRampToValueAtTime(659.25, audioContext.currentTime + 0.1); // Mi
+            oscillator.frequency.exponentialRampToValueAtTime(783.99, audioContext.currentTime + 0.2); // Sol
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.3);
+        }
+        
+        function createFreezeSound() {
+            if (!soundEnabled) return;
+            
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(1000, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(300, audioContext.currentTime + 0.5);
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+        
+        // Toggle suono
+        soundToggle.addEventListener('click', function() {
+            soundEnabled = !soundEnabled;
+            soundToggle.textContent = soundEnabled ? '🔊' : '🔇';
+        });
+        
+        // ========== GAME VARIABLES ==========
+        let gameActive = false;
+        let currentLevel = 1;
+        let score = 0;
+        let rocksDestroyed = 0;
+        let specialRockets = 0;
+        let goldCount = 0;
+        let goldEarnedThisLevel = 0;
+        let shipLevel = 1;
+        let player;
+        let bullets = [];
+        let specialRocketsArray = [];
+        let rocks = [];
+        let enemies = [];
+        let powerUps = [];
+        let golds = [];
+        let stars = [];
+        let particles = [];
+        let boss = null;
+        let keys = {};
+        let combo = 0;
+        let multiplier = 1;
+        let comboTimeout = null;
+        let currentMission = null;
+        let missionTimer = 0;
+        let selectedShip = 'base';
+        let gameData = {
+            highScore: 0,
+            levelsUnlocked: 1,
+            shipsUnlocked: ['base'],
+            achievements: []
+        };
+
+        // ========== SHIP TYPES ==========
+        const ships = {
+            base: { 
+                name: 'Navicella Base',
+                speed: 5, 
+                fireRate: 1, 
+                special: 'none',
+                color: '#4a9eff',
+                damage: 1
+            },
+            speedster: { 
+                name: 'Velocista',
+                speed: 7, 
+                fireRate: 1.5, 
+                special: 'dash',
+                color: '#00ffcc',
+                damage: 0.8
+            },
+            tank: { 
+                name: 'Corazzata',
+                speed: 3, 
+                fireRate: 0.8, 
+                special: 'shield',
+                color: '#ff5555',
+                damage: 1.2
+            },
+            sniper: { 
+                name: 'Cecchino',
+                speed: 4, 
+                fireRate: 0.6, 
+                special: 'piercing',
+                color: '#cc00ff',
+                damage: 2
+            }
+        };
+        
+        // ========== LEVEL CONFIGURATION ==========
+        const levels = {
+            1: {
+                rocks: 15,
+                rockHealth: 3,
+                playerSpeed: 5,
+                bgColor: '#0a0a2a',
+                bgPattern: 'milkyWay',
+                bulletSpeed: 10,
+                bulletDamage: 1,
+                enemies: 3,
+                boss: false
+            },
+            2: {
+                rocks: 20,
+                rockHealth: 4,
+                playerSpeed: 5,
+                bgColor: '#0a1a2a',
+                bgPattern: 'nebula',
+                bulletSpeed: 10,
+                bulletDamage: 1,
+                enemies: 4,
+                boss: true,
+                bossType: 'alien'
+            },
+            3: {
+                rocks: 25,
+                rockHealth: 5,
+                playerSpeed: 5,
+                bgColor: '#1a0a2a',
+                bgPattern: 'galaxy',
+                bulletSpeed: 12,
+                bulletDamage: 1,
+                enemies: 5,
+                boss: false
+            },
+            4: {
+                rocks: 30,
+                rockHealth: 6,
+                playerSpeed: 5,
+                bgColor: '#1a1a2a',
+                bgPattern: 'comet',
+                bulletSpeed: 12,
+                bulletDamage: 1,
+                enemies: 6,
+                boss: true,
+                bossType: 'alien'
+            },
+            5: {
+                rocks: 35,
+                rockHealth: 7,
+                playerSpeed: 5,
+                bgColor: '#2a0a1a',
+                bgPattern: 'asteroidField',
+                bulletSpeed: 12,
+                bulletDamage: 1,
+                enemies: 7,
+                boss: false
+            },
+            6: {
+                rocks: 40,
+                rockHealth: 8,
+                playerSpeed: 5,
+                bgColor: '#2a1a0a',
+                bgPattern: 'blackHole',
+                bulletSpeed: 12,
+                bulletDamage: 1,
+                enemies: 8,
+                boss: true,
+                bossType: 'alien'
+            }
+        };
+        
+        // ========== POWER-UP TYPES ==========
+        const powerUpTypes = {
+            shield: { 
+                color: '#00aaff', 
+                effect: 'Scudo attivo!'
+            },
+            rapidFire: { 
+                color: '#ffaa00', 
+                effect: 'Fuoco rapido!'
+            },
+            doublePoints: { 
+                color: '#00ff00', 
+                effect: 'Punti doppi!'
+            },
+            freeze: { 
+                color: '#00ffff', 
+                effect: 'Nemici congelati!',
+                duration: 4000 // 4 secondi
+            }
+        };
+
+        // ========== PLAYER CLASS ==========
+        class Player {
+            constructor() {
+                this.shipType = selectedShip;
+                this.config = ships[this.shipType];
+                this.width = 40;
+                this.height = 60;
+                this.x = canvas.width / 2 - this.width / 2;
+                this.y = canvas.height - this.height - 20;
+                this.speed = this.config.speed;
+                this.color = this.config.color;
+                this.health = 100;
+                this.maxHealth = 100;
+                this.shootCooldown = 0;
+                this.specialCooldown = 0;
+                this.shieldActive = false;
+                this.rapidFire = false;
+                this.doublePoints = false;
+                this.freezeEnemies = false;
+                this.freezeTimeout = null;
+                this.dashCooldown = 0;
+                this.piercingShots = this.config.special === 'piercing';
+            }
+            
+            draw() {
+                ctx.fillStyle = this.shieldActive ? '#00aaff' : this.color;
+                ctx.beginPath();
+                
+                if (shipLevel === 1) {
+                    ctx.moveTo(this.x + this.width / 2, this.y);
+                    ctx.lineTo(this.x + this.width, this.y + this.height / 2);
+                    ctx.lineTo(this.x + this.width / 2, this.y + this.height);
+                    ctx.lineTo(this.x, this.y + this.height / 2);
+                } else if (shipLevel === 2) {
+                    ctx.moveTo(this.x + this.width / 2, this.y);
+                    ctx.lineTo(this.x + this.width, this.y + this.height / 3);
+                    ctx.lineTo(this.x + this.width * 0.8, this.y + this.height);
+                    ctx.lineTo(this.x + this.width / 2, this.y + this.height * 0.8);
+                    ctx.lineTo(this.x + this.width * 0.2, this.y + this.height);
+                    ctx.lineTo(this.x, this.y + this.height / 3);
+                } else {
+                    ctx.moveTo(this.x + this.width / 2, this.y);
+                    ctx.lineTo(this.x + this.width, this.y + this.height / 4);
+                    ctx.lineTo(this.x + this.width * 0.9, this.y + this.height / 2);
+                    ctx.lineTo(this.x + this.width, this.y + this.height * 0.7);
+                    ctx.lineTo(this.x + this.width * 0.7, this.y + this.height);
+                    ctx.lineTo(this.x + this.width / 2, this.y + this.height * 0.9);
+                    ctx.lineTo(this.x + this.width * 0.3, this.y + this.height);
+                    ctx.lineTo(this.x, this.y + this.height * 0.7);
+                    ctx.lineTo(this.x + this.width * 0.1, this.y + this.height / 2);
+                    ctx.lineTo(this.x, this.y + this.height / 4);
+                }
+                
+                ctx.closePath();
+                ctx.fill();
+                
+                if (this.shieldActive) {
+                    ctx.strokeStyle = 'rgba(0, 170, 255, 0.7)';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.arc(this.x + this.width / 2, this.y + this.height / 2, this.width, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+                
+                let cockpitColor = '#aaddff';
+                if (shipLevel >= 2) cockpitColor = '#ddffaa';
+                if (shipLevel >= 3) cockpitColor = '#ffddaa';
+                
+                ctx.fillStyle = cockpitColor;
+                ctx.beginPath();
+                ctx.arc(this.x + this.width / 2, this.y + this.height / 2, 10, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#ff5500';
+                if (shipLevel === 1) {
+                    ctx.fillRect(this.x + 5, this.y + this.height, this.width / 4, 10);
+                    ctx.fillRect(this.x + this.width - this.width / 4 - 5, this.y + this.height, this.width / 4, 10);
+                } else if (shipLevel === 2) {
+                    ctx.fillRect(this.x, this.y + this.height, this.width / 5, 10);
+                    ctx.fillRect(this.x + this.width / 4, this.y + this.height, this.width / 5, 10);
+                    ctx.fillRect(this.x + this.width * 0.55, this.y + this.height, this.width / 5, 10);
+                    ctx.fillRect(this.x + this.width * 0.8, this.y + this.height, this.width / 5, 10);
+                } else {
+                    ctx.fillRect(this.x, this.y + this.height, this.width / 6, 12);
+                    ctx.fillRect(this.x + this.width / 5, this.y + this.height, this.width / 6, 12);
+                    ctx.fillRect(this.x + this.width * 0.45, this.y + this.height, this.width / 6, 12);
+                    ctx.fillRect(this.x + this.width * 0.65, this.y + this.height, this.width / 6, 12);
+                    ctx.fillRect(this.x + this.width * 0.85, this.y + this.height, this.width / 6, 12);
+                }
+                
+                if (gameActive) {
+                    let flameColor = '#ffcc00';
+                    if (shipLevel >= 2) flameColor = '#ffaa00';
+                    if (shipLevel >= 3) flameColor = '#ff8800';
+                    
+                    ctx.fillStyle = flameColor;
+                    if (shipLevel === 1) {
+                        ctx.fillRect(this.x + 7, this.y + this.height + 10, this.width / 6, 8);
+                        ctx.fillRect(this.x + this.width - this.width / 6 - 7, this.y + this.height + 10, this.width / 6, 8);
+                    } else if (shipLevel === 2) {
+                        ctx.fillRect(this.x + 2, this.y + this.height + 10, this.width / 7, 8);
+                        ctx.fillRect(this.x + this.width / 4 + 2, this.y + this.height + 10, this.width / 7, 8);
+                        ctx.fillRect(this.x + this.width * 0.55 + 2, this.y + this.height + 10, this.width / 7, 8);
+                        ctx.fillRect(this.x + this.width * 0.8 + 2, this.y + this.height + 10, this.width / 7, 8);
+                    } else {
+                        ctx.fillRect(this.x + 2, this.y + this.height + 10, this.width / 8, 10);
+                        ctx.fillRect(this.x + this.width / 5 + 2, this.y + this.height + 10, this.width / 8, 10);
+                        ctx.fillRect(this.x + this.width * 0.45 + 2, this.y + this.height + 10, this.width / 8, 10);
+                        ctx.fillRect(this.x + this.width * 0.65 + 2, this.y + this.height + 10, this.width / 8, 10);
+                        ctx.fillRect(this.x + this.width * 0.85 + 2, this.y + this.height + 10, this.width / 8, 10);
+                    }
+                }
+                
+                if (shipLevel >= 2) {
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect(this.x - 15, this.y + this.height / 3, 15, 5);
+                    ctx.fillRect(this.x + this.width, this.y + this.height / 3, 15, 5);
+                    
+                    if (shipLevel >= 3) {
+                        ctx.fillStyle = '#ff5555';
+                        ctx.fillRect(this.x - 10, this.y + this.height / 2, 10, 5);
+                        ctx.fillRect(this.x + this.width, this.y + this.height / 2, 10, 5);
+                    }
+                }
+                
+                const barWidth = 100;
+                const barHeight = 10;
+                const barX = this.x + this.width / 2 - barWidth / 2;
+                const barY = this.y - 20;
+                
+                ctx.fillStyle = '#333333';
+                ctx.fillRect(barX, barY, barWidth, barHeight);
+                
+                ctx.fillStyle = this.health > this.maxHealth / 2 ? '#00ff00' : '#ff0000';
+                ctx.fillRect(barX, barY, barWidth * (this.health / this.maxHealth), barHeight);
+            }
+            
+            update() {
+                let moveSpeed = this.speed;
+                
+                if (this.config.special === 'dash' && keys['Shift'] && this.dashCooldown === 0) {
+                    moveSpeed *= 2;
+                    this.dashCooldown = 60;
+                }
+                
+                if (this.dashCooldown > 0) {
+                    this.dashCooldown--;
+                }
+                
+                if (keys['ArrowLeft'] && this.x > 0) {
+                    this.x -= moveSpeed;
+                }
+                if (keys['ArrowRight'] && this.x < canvas.width - this.width) {
+                    this.x += moveSpeed;
+                }
+                if (keys['ArrowUp'] && this.y > 0) {
+                    this.y -= moveSpeed;
+                }
+                if (keys['ArrowDown'] && this.y < canvas.height - this.height) {
+                    this.y += moveSpeed;
+                }
+                
+                if (this.shootCooldown > 0) {
+                    this.shootCooldown--;
+                }
+                
+                if (keys[' '] && this.shootCooldown === 0) {
+                    this.shoot();
+                    
+                    let baseCooldown = 15 - shipLevel * 2;
+                    if (this.rapidFire) baseCooldown /= 2;
+                    baseCooldown /= this.config.fireRate;
+                    
+                    this.shootCooldown = Math.max(5, Math.floor(baseCooldown));
+                }
+                
+                if ((keys['v'] || keys['V']) && specialRockets > 0) {
+                    this.shootSpecial();
+                    keys['v'] = false;
+                    keys['V'] = false;
+                }
+            }
+            
+            shoot() {
+                createShootSound();
+                
+                const bulletConfig = levels[currentLevel];
+                
+                // Armi basate sul livello della nave
+                if (shipLevel === 1) {
+                    bullets.push(new Bullet(this.x + this.width / 2, this.y, bulletConfig, this.config.damage, this.piercingShots));
+                } else if (shipLevel === 2) {
+                    bullets.push(new Bullet(this.x + this.width / 3, this.y, bulletConfig, this.config.damage, this.piercingShots));
+                    bullets.push(new Bullet(this.x + 2 * this.width / 3, this.y, bulletConfig, this.config.damage, this.piercingShots));
+                } else {
+                    bullets.push(new Bullet(this.x + this.width / 4, this.y, bulletConfig, this.config.damage, this.piercingShots));
+                    bullets.push(new Bullet(this.x + this.width / 2, this.y, bulletConfig, this.config.damage, this.piercingShots));
+                    bullets.push(new Bullet(this.x + 3 * this.width / 4, this.y, bulletConfig, this.config.damage, this.piercingShots));
+                }
+            }
+            
+            shootSpecial() {
+                if (specialRockets > 0) {
+                    specialRocketsArray.push(new SpecialRocket(this.x + this.width / 2, this.y));
+                    specialRockets--;
+                    specialWeaponDisplay.textContent = `RAZZI: ${specialRockets}`;
+                    
+                    for (let i = 0; i < 15; i++) {
+                        particles.push(new Particle(
+                            this.x + this.width / 2, 
+                            this.y + this.height, 
+                            '#ff5500',
+                            2
+                        ));
+                    }
+                }
+            }
+            
+            activatePowerUp(type) {
+                const powerUp = powerUpTypes[type];
+                
+                switch(type) {
+                    case 'shield':
+                        this.shieldActive = true;
+                        break;
+                    case 'rapidFire':
+                        this.rapidFire = true;
+                        break;
+                    case 'doublePoints':
+                        this.doublePoints = true;
+                        break;
+                    case 'freeze':
+                        this.freezeEnemies = true;
+                        createFreezeSound();
+                        
+                        // Clear any existing freeze timeout
+                        if (this.freezeTimeout) {
+                            clearTimeout(this.freezeTimeout);
+                        }
+                        
+                        // Set timeout to disable freeze after 4 seconds
+                        this.freezeTimeout = setTimeout(() => {
+                            this.freezeEnemies = false;
+                        }, powerUpTypes.freeze.duration);
+                        break;
+                }
+                
+                powerUpIndicator.textContent = powerUp.effect;
+                powerUpIndicator.style.display = 'block';
+                
+                setTimeout(() => {
+                    powerUpIndicator.style.display = 'none';
+                }, 2000);
+            }
+            
+            takeDamage(amount) {
+                if (this.shieldActive) return false;
+                
+                this.health -= amount;
+                if (this.health <= 0) {
+                    this.health = 0;
+                    gameOver();
+                }
+                return true;
+            }
+        }
+
+        // ========== BULLET CLASS ==========
+        class Bullet {
+            constructor(x, y, config, damageMultiplier = 1, piercing = false, angle = 0) {
+                this.x = x;
+                this.y = y;
+                this.width = 4 + (config.bulletDamage - 1) * 2;
+                this.height = 12 + (config.bulletDamage - 1) * 3;
+                this.speed = config.bulletSpeed;
+                this.damage = config.bulletDamage * damageMultiplier;
+                this.color = shipLevel === 1 ? '#ffcc00' : 
+                             shipLevel === 2 ? '#00ffcc' : '#ff00cc';
+                this.piercing = piercing;
+                this.penetrated = 0;
+                this.angle = angle * (Math.PI / 180);
+                this.speedX = Math.sin(this.angle) * this.speed;
+                this.speedY = -Math.cos(this.angle) * this.speed;
+            }
+            
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+                
+                ctx.fillStyle = this.color;
+                ctx.fillRect(-this.width / 2, 0, this.width, this.height);
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(-1, 0, 2, 4);
+                
+                if (shipLevel >= 2) {
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(0, this.height, this.width / 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                if (shipLevel >= 3) {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.beginPath();
+                    ctx.arc(0, this.height, this.width / 4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                ctx.restore();
+            }
+            
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                return this.y < 0 || this.x < 0 || this.x > canvas.width;
+            }
+        }
+
+        // ========== SPECIAL ROCKET CLASS ==========
+        class SpecialRocket {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.width = 12;
+                this.height = 20;
+                this.speed = 8;
+                this.color = '#ff5500';
+                this.trailParticles = [];
+            }
+            
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(this.x - this.width / 2, this.y + this.height);
+                ctx.lineTo(this.x + this.width / 2, this.y + this.height);
+                ctx.closePath();
+                ctx.fill();
+                
+                ctx.fillStyle = '#ffcc00';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.width / 2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#ff8800';
+                ctx.fillRect(this.x - this.width, this.y + this.height / 2, this.width, 4);
+                ctx.fillRect(this.x, this.y + this.height / 2, this.width, 4);
+                
+                for (let i = 0; i < this.trailParticles.length; i++) {
+                    const p = this.trailParticles[i];
+                    ctx.fillStyle = `rgba(255, ${100 + p.life * 5}, 0, ${p.life / 20})`;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            
+            update() {
+                this.y -= this.speed;
+                
+                if (Math.random() < 0.7) {
+                    this.trailParticles.push({
+                        x: this.x + (Math.random() - 0.5) * 10,
+                        y: this.y + this.height + Math.random() * 10,
+                        size: Math.random() * 3 + 1,
+                        life: 20
+                    });
+                }
+                
+                for (let i = this.trailParticles.length - 1; i >= 0; i--) {
+                    this.trailParticles[i].life--;
+                    if (this.trailParticles[i].life <= 0) {
+                        this.trailParticles.splice(i, 1);
+                    }
+                }
+                
+                return this.y < -this.height;
+            }
+            
+            explode() {
+                createExplosionSound();
+                
+                for (let i = 0; i < 50; i++) {
+                    particles.push(new Particle(
+                        this.x, 
+                        this.y, 
+                        '#ff5500',
+                        5
+                    ));
+                }
+                
+                ctx.fillStyle = 'rgba(255, 200, 0, 0.3)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 80, 0, Math.PI * 2);
+                ctx.fill();
+                
+                const explosionRadius = 100;
+                for (let i = rocks.length - 1; i >= 0; i--) {
+                    const dx = rocks[i].x - this.x;
+                    const dy = rocks[i].y - this.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < explosionRadius + rocks[i].radius) {
+                        addScore(30);
+                        rocksDestroyed++;
+                        
+                        for (let j = 0; j < 15; j++) {
+                            particles.push(new Particle(
+                                rocks[i].x, 
+                                rocks[i].y, 
+                                '#ff9900',
+                                3
+                            ));
+                        }
+                        
+                        rocks.splice(i, 1);
+                    }
+                }
+                
+                for (let i = enemies.length - 1; i >= 0; i--) {
+                    const dx = enemies[i].x - this.x;
+                    const dy = enemies[i].y - this.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < explosionRadius + enemies[i].radius) {
+                        addScore(50);
+                        
+                        for (let j = 0; j < 15; j++) {
+                            particles.push(new Particle(
+                                enemies[i].x, 
+                                enemies[i].y, 
+                                '#ff0000',
+                                3
+                            ));
+                        }
+                        
+                        enemies.splice(i, 1);
+                    }
+                }
+                
+                if (boss && boss.health > 0) {
+                    const dx = boss.x - this.x;
+                    const dy = boss.y - this.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < explosionRadius + boss.radius) {
+                        boss.takeDamage(10);
+                    }
+                }
+            }
+        }
+
+        // ========== ROCK CLASS ==========
+        class Rock {
+            constructor() {
+                this.radius = 25 + Math.random() * 25;
+                this.x = Math.random() * (canvas.width - this.radius * 2) + this.radius;
+                this.y = Math.random() * (canvas.height / 2) + 50;
+                this.health = levels[currentLevel].rockHealth;
+                this.maxHealth = this.health;
+                this.color = '#663300';
+                this.speedX = (Math.random() - 0.5) * 2;
+                this.speedY = (Math.random() - 0.5) * 2;
+                this.frozen = false;
+            }
+            
+            draw() {
+                ctx.fillStyle = this.frozen ? '#aaccff' : this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = this.frozen ? '#88aadd' : '#442200';
+                ctx.beginPath();
+                ctx.arc(this.x - this.radius / 3, this.y - this.radius / 4, this.radius / 2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = this.frozen ? '#99bbee' : '#552200';
+                ctx.beginPath();
+                ctx.arc(this.x + this.radius / 4, this.y + this.radius / 3, this.radius / 3, 0, Math.PI * 2);
+                ctx.fill();
+                
+                const barWidth = this.radius * 1.5;
+                const barHeight = 5;
+                const barX = this.x - barWidth / 2;
+                const barY = this.y - this.radius - 10;
+                
+                ctx.fillStyle = '#333333';
+                ctx.fillRect(barX, barY, barWidth, barHeight);
+                
+                ctx.fillStyle = this.health > this.maxHealth / 2 ? '#00ff00' : '#ff0000';
+                ctx.fillRect(barX, barY, barWidth * (this.health / this.maxHealth), barHeight);
+            }
+            
+            update() {
+                if (player.freezeEnemies) {
+                    this.frozen = true;
+                    return;
+                }
+                
+                this.frozen = false;
+                this.x += this.speedX;
+                this.y += this.speedY;
+                
+                if (this.x < this.radius || this.x > canvas.width - this.radius) {
+                    this.speedX *= -1;
+                }
+                if (this.y < this.radius || this.y > canvas.height / 2) {
+                    this.speedY *= -1;
+                }
+            }
+            
+            takeDamage(damage) {
+                this.health -= damage;
+                if (this.health <= 0) {
+                    createExplosionSound();
+                    
+                    if (Math.random() < 0.2) {
+                        this.dropPowerUp();
+                    }
+                    if (Math.random() < 0.3) {
+                        this.dropGold();
+                    }
+                    return true;
+                }
+                return false;
+            }
+            
+            dropPowerUp() {
+                const types = Object.keys(powerUpTypes);
+                const randomType = types[Math.floor(Math.random() * types.length)];
+                powerUps.push(new PowerUp(this.x, this.y, randomType));
+            }
+            
+            dropGold() {
+                golds.push(new Gold(this.x, this.y));
+            }
+        }
+
+        // ========== GOLD CLASS ==========
+        class Gold {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.radius = 8;
+                this.speed = 2;
+                this.color = '#FFD700';
+                this.value = 1;
+                this.rotation = 0;
+                this.size = 8 + Math.random() * 4; // Dimensioni variabili per aspetto grezzo
+            }
+            
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                
+                // Disegna una forma irregolare simile a un pezzetto d'oro grezzo
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                
+                // Crea una forma irregolare con punti casuali
+                const points = 6 + Math.floor(Math.random() * 3); // 6-8 punti per forma irregolare
+                for (let i = 0; i < points; i++) {
+                    const angle = (i / points) * Math.PI * 2;
+                    const radius = this.size * (0.7 + Math.random() * 0.3); // Raggio variabile
+                    const x = Math.cos(angle) * radius;
+                    const y = Math.sin(angle) * radius;
+                    
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                
+                ctx.closePath();
+                ctx.fill();
+                
+                // Aggiungi dettagli per renderlo più realistico
+                ctx.fillStyle = '#FFA500';
+                ctx.beginPath();
+                for (let i = 0; i < 3; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const radius = this.size * (0.3 + Math.random() * 0.2);
+                    const x = Math.cos(angle) * radius;
+                    const y = Math.sin(angle) * radius;
+                    const smallRadius = this.size * 0.2;
+                    
+                    ctx.moveTo(x, y);
+                    ctx.arc(x, y, smallRadius, 0, Math.PI * 2);
+                }
+                ctx.fill();
+                
+                ctx.restore();
+            }
+            
+            update() {
+                this.y += this.speed;
+                this.rotation += 0.05;
+                return this.y > canvas.height;
+            }
+        }
+
+        // ========== ENEMY CLASS ==========
+        class Enemy {
+            constructor(type) {
+                this.type = type || this.getRandomType();
+                this.radius = 20;
+                this.x = Math.random() * (canvas.width - this.radius * 2) + this.radius;
+                this.y = Math.random() * (canvas.height / 3) + 30;
+                this.health = 3;
+                this.speedX = (Math.random() - 0.5) * 2;
+                this.speedY = (Math.random() - 0.5) * 2;
+                this.color = this.getColor();
+                this.shootCooldown = 0;
+                this.frozen = false;
+            }
+            
+            getRandomType() {
+                const types = ['shooter', 'charger'];
+                return types[Math.floor(Math.random() * types.length)];
+            }
+            
+            getColor() {
+                switch(this.type) {
+                    case 'shooter': return '#ff0000';
+                    case 'charger': return '#ff8800';
+                    default: return '#ff0000';
+                }
+            }
+            
+            draw() {
+                ctx.fillStyle = this.frozen ? '#aaccff' : this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = this.frozen ? '#88aadd' : '#aa0000';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius * 0.6, 0, Math.PI * 2);
+                ctx.fill();
+                
+                const barWidth = this.radius * 2;
+                const barHeight = 4;
+                const barX = this.x - barWidth / 2;
+                const barY = this.y - this.radius - 8;
+                
+                ctx.fillStyle = '#333333';
+                ctx.fillRect(barX, barY, barWidth, barHeight);
+                
+                ctx.fillStyle = '#00ff00';
+                ctx.fillRect(barX, barY, barWidth * (this.health / 3), barHeight);
+            }
+            
+            update() {
+                if (player.freezeEnemies) {
+                    this.frozen = true;
+                    return;
+                }
+                
+                this.frozen = false;
+                
+                switch(this.type) {
+                    case 'shooter':
+                        this.x += this.speedX;
+                        this.y += this.speedY;
+                        
+                        if (this.x < this.radius || this.x > canvas.width - this.radius) {
+                            this.speedX *= -1;
+                        }
+                        if (this.y < this.radius || this.y > canvas.height / 3) {
+                            this.speedY *= -1;
+                        }
+                        
+                        if (this.shootCooldown > 0) {
+                            this.shootCooldown--;
+                        } else if (Math.random() < 0.01) {
+                            this.shoot();
+                            this.shootCooldown = 120;
+                        }
+                        break;
+                        
+                    case 'charger':
+                        const dx = player.x + player.width/2 - this.x;
+                        const dy = player.y + player.height/2 - this.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance > 0) {
+                            this.x += (dx / distance) * 2;
+                            this.y += (dy / distance) * 2;
+                        }
+                        break;
+                }
+            }
+            
+            shoot() {
+                // Implementazione base per proiettili nemici
+            }
+            
+            takeDamage(damage) {
+                this.health -= damage;
+                return this.health <= 0;
+            }
+        }
+
+        // ========== BOSS CLASS ==========
+        class Boss {
+            constructor(type) {
+                this.type = type || 'alien';
+                this.radius = 60;
+                this.x = canvas.width / 2;
+                this.y = 100;
+                this.health = 50;
+                this.maxHealth = this.health;
+                this.speedX = 2;
+                this.speedY = 1;
+                this.color = '#ff0000';
+                this.shootCooldown = 0;
+                this.attackCooldown = 0;
+                this.frozen = false;
+                this.bullets = [];
+            }
+            
+            draw() {
+                ctx.fillStyle = this.frozen ? '#aaccff' : this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = this.frozen ? '#88aadd' : '#aa0000';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius * 0.7, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#ff5500';
+                ctx.beginPath();
+                ctx.arc(this.x - this.radius * 0.4, this.y, this.radius * 0.2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(this.x + this.radius * 0.4, this.y, this.radius * 0.2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                const barWidth = 200;
+                const barHeight = 10;
+                const barX = this.x - barWidth / 2;
+                const barY = this.y - this.radius - 20;
+                
+                ctx.fillStyle = '#333333';
+                ctx.fillRect(barX, barY, barWidth, barHeight);
+                
+                ctx.fillStyle = this.health > this.maxHealth / 2 ? '#00ff00' : '#ff0000';
+                ctx.fillRect(barX, barY, barWidth * (this.health / this.maxHealth), barHeight);
+                
+                // Draw boss name
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('BOSS', this.x, this.y);
+            }
+            
+            update() {
+                if (player.freezeEnemies) {
+                    this.frozen = true;
+                    return;
+                }
+                
+                this.frozen = false;
+                
+                this.x += this.speedX;
+                this.y += this.speedY;
+                
+                if (this.x < this.radius || this.x > canvas.width - this.radius) {
+                    this.speedX *= -1;
+                }
+                if (this.y < this.radius || this.y > canvas.height / 3) {
+                    this.speedY *= -1;
+                }
+                
+                if (this.shootCooldown > 0) {
+                    this.shootCooldown--;
+                } else {
+                    this.shoot();
+                    this.shootCooldown = 60;
+                }
+                
+                if (this.attackCooldown > 0) {
+                    this.attackCooldown--;
+                } else {
+                    this.specialAttack();
+                    this.attackCooldown = 180;
+                }
+                
+                // Update boss bullets
+                for (let i = this.bullets.length - 1; i >= 0; i--) {
+                    if (this.bullets[i].update()) {
+                        this.bullets.splice(i, 1);
+                    }
+                }
+            }
+            
+            shoot() {
+                this.bullets.push(new BossBullet(this.x, this.y, -Math.PI/2));
+                this.bullets.push(new BossBullet(this.x, this.y, -Math.PI/2 - 0.3));
+                this.bullets.push(new BossBullet(this.x, this.y, -Math.PI/2 + 0.3));
+            }
+            
+            specialAttack() {
+                for (let i = 0; i < 8; i++) {
+                    this.bullets.push(new BossBullet(this.x, this.y, -Math.PI/2 + (i * Math.PI/4)));
+                }
+            }
+            
+            takeDamage(damage) {
+                this.health -= damage;
+                if (this.health <= 0) {
+                    addScore(200);
+                    for (let i = 0; i < 30; i++) {
+                        particles.push(new Particle(
+                            this.x, 
+                            this.y, 
+                            '#ff0000',
+                            3
+                        ));
+                    }
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        // ========== BOSS BULLET CLASS ==========
+        class BossBullet {
+            constructor(x, y, angle) {
+                this.x = x;
+                this.y = y;
+                this.radius = 8;
+                this.speed = 5;
+                this.angle = angle;
+                this.speedX = Math.sin(this.angle) * this.speed;
+                this.speedY = -Math.cos(this.angle) * this.speed;
+                this.color = '#ff5555';
+            }
+            
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius / 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                return this.y > canvas.height || this.x < 0 || this.x > canvas.width || this.y < 0;
+            }
+        }
+
+        // ========== POWER-UP CLASS ==========
+        class PowerUp {
+            constructor(x, y, type) {
+                this.x = x;
+                this.y = y;
+                this.type = type;
+                this.width = 20;
+                this.height = 20;
+                this.speed = 2;
+                this.color = powerUpTypes[type].color;
+            }
+            
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.width / 2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                switch(this.type) {
+                    case 'shield':
+                        ctx.fillText('S', this.x, this.y);
+                        break;
+                    case 'rapidFire':
+                        ctx.fillText('R', this.x, this.y);
+                        break;
+                    case 'doublePoints':
+                        ctx.fillText('2x', this.x, this.y);
+                        break;
+                    case 'freeze':
+                        ctx.fillText('F', this.x, this.y);
+                        break;
+                }
+            }
+            
+            update() {
+                this.y += this.speed;
+                return this.y > canvas.height;
+            }
+        }
+
+        // ========== STAR CLASS ==========
+        class Star {
+            constructor(pattern) {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2;
+                this.speed = Math.random() * 0.5;
+                this.brightness = Math.random();
+                this.pattern = pattern;
+                
+                // Different star colors based on pattern
+                switch(pattern) {
+                    case 'milkyWay':
+                        this.color = {r: 255, g: 255, b: 255};
+                        break;
+                    case 'nebula':
+                        this.color = {r: 200, g: 150, b: 255};
+                        break;
+                    case 'galaxy':
+                        this.color = {r: 255, g: 200, b: 100};
+                        break;
+                    case 'comet':
+                        this.color = {r: 150, g: 200, b: 255};
+                        break;
+                    case 'asteroidField':
+                        this.color = {r: 255, g: 150, b: 150};
+                        break;
+                    case 'blackHole':
+                        this.color = {r: 100, g: 100, b: 255};
+                        break;
+                    default:
+                        this.color = {r: 255, g: 255, b: 255};
+                }
+            }
+            
+            draw() {
+                ctx.fillStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.brightness})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            update() {
+                this.y += this.speed;
+                if (this.y > canvas.height) {
+                    this.y = 0;
+                    this.x = Math.random() * canvas.width;
+                }
+                
+                this.brightness = 0.5 + Math.sin(Date.now() * 0.001 + this.x) * 0.5;
+            }
+        }
+
+        // ========== PARTICLE CLASS ==========
+        class Particle {
+            constructor(x, y, color, sizeMultiplier = 1) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 3 * sizeMultiplier + 1;
+                this.speedX = Math.random() * 6 - 3;
+                this.speedY = Math.random() * 6 - 3;
+                this.color = color;
+                this.life = 30;
+            }
+            
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.life--;
+                
+                return this.life <= 0;
+            }
+        }
+
+        // ========== GAME FUNCTIONS ==========
+        function addScore(points) {
+            let actualPoints = points;
+            if (player.doublePoints) actualPoints *= 2;
+            if (multiplier > 1) actualPoints *= multiplier;
+            
+            score += actualPoints;
+            scoreDisplay.textContent = `PUNTI: ${score}`;
+        }
+
+        function addGold(value = 1) {
+            const oldShipLevel = shipLevel;
+            
+            goldCount += value;
+            goldEarnedThisLevel += value;
+            
+            // Calcola il nuovo livello della nave (ogni 10 GOLD)
+            shipLevel = Math.min(3, Math.floor(goldCount / 10) + 1);
+            
+            goldDisplay.textContent = `GOLD: ${Math.floor(goldCount)}`;
+            
+            // Aggiungi un razzo ogni 2 monete d'oro
+            if (Math.floor(goldCount) % 2 === 0 && Math.floor(goldCount) > 0) {
+                specialRockets++;
+                specialWeaponDisplay.textContent = `RAZZI: ${specialRockets}`;
+            }
+            
+            // Riproduci suono moneta
+            createMoneySound();
+            
+            goldIndicator.textContent = `+${value} GOLD!`;
+            goldIndicator.style.display = 'block';
+            
+            setTimeout(() => {
+                goldIndicator.style.display = 'none';
+            }, 2000);
+            
+            // Mostra notifica evoluzione se il livello è cambiato
+            if (shipLevel > oldShipLevel) {
+                showEvolutionNotification(oldShipLevel, shipLevel);
+            }
+        }
+
+        function showEvolutionNotification(oldLevel, newLevel) {
+            evolutionDetails.textContent = `La tua navicella è passata dal livello ${oldLevel} al livello ${newLevel}! Nuove armi sbloccate.`;
+            evolutionNotification.style.display = 'block';
+            
+            setTimeout(() => {
+                evolutionNotification.style.display = 'none';
+            }, 4000);
+        }
+
+        function addCombo() {
+            combo++;
+            
+            multiplier = 1 + Math.floor(combo / 5);
+            comboDisplay.textContent = `COMBO: ${multiplier}x`;
+            
+            clearTimeout(comboTimeout);
+            comboTimeout = setTimeout(() => {
+                combo = 0;
+                multiplier = 1;
+                comboDisplay.textContent = `COMBO: ${multiplier}x`;
+            }, 3000);
+        }
+
+        function drawBackground() {
+            const levelConfig = levels[currentLevel];
+            
+            // Draw gradient background
+            const gradient = ctx.createRadialGradient(
+                canvas.width / 2, canvas.height / 2, 0,
+                canvas.width / 2, canvas.height / 2, Math.max(canvas.width, canvas.height)
+            );
+            
+            switch(levelConfig.bgPattern) {
+                case 'milkyWay':
+                    gradient.addColorStop(0, '#0a0a2a');
+                    gradient.addColorStop(1, '#000011');
+                    break;
+                case 'nebula':
+                    gradient.addColorStop(0, '#1a0a3a');
+                    gradient.addColorStop(1, '#0a0a2a');
+                    break;
+                case 'galaxy':
+                    gradient.addColorStop(0, '#2a0a1a');
+                    gradient.addColorStop(1, '#0a0a2a');
+                    break;
+                case 'comet':
+                    gradient.addColorStop(0, '#0a2a2a');
+                    gradient.addColorStop(1, '#001122');
+                    break;
+                case 'asteroidField':
+                    gradient.addColorStop(0, '#2a2a0a');
+                    gradient.addColorStop(1, '#111100');
+                    break;
+                case 'blackHole':
+                    gradient.addColorStop(0, '#000000');
+                    gradient.addColorStop(1, '#0a0a1a');
+                    break;
+                default:
+                    gradient.addColorStop(0, levelConfig.bgColor);
+                    gradient.addColorStop(1, '#000011');
+            }
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw special background elements based on pattern
+            switch(levelConfig.bgPattern) {
+                case 'milkyWay':
+                    // Draw a milky way streak
+                    ctx.fillStyle = 'rgba(100, 100, 200, 0.1)';
+                    ctx.beginPath();
+                    ctx.ellipse(canvas.width / 2, canvas.height / 2, canvas.width * 0.8, canvas.height * 0.1, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    break;
+                case 'nebula':
+                    // Draw nebula clouds
+                    ctx.fillStyle = 'rgba(150, 100, 200, 0.1)';
+                    ctx.beginPath();
+                    ctx.arc(canvas.width * 0.3, canvas.height * 0.3, canvas.width * 0.2, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = 'rgba(200, 100, 150, 0.1)';
+                    ctx.beginPath();
+                    ctx.arc(canvas.width * 0.7, canvas.height * 0.7, canvas.width * 0.15, 0, Math.PI * 2);
+                    ctx.fill();
+                    break;
+                case 'galaxy':
+                    // Draw spiral galaxy
+                    ctx.strokeStyle = 'rgba(200, 150, 100, 0.1)';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    for (let i = 0; i < 3; i++) {
+                        ctx.ellipse(canvas.width / 2, canvas.height / 2, canvas.width * (0.2 + i * 0.1), canvas.height * (0.05 + i * 0.05), Math.PI / 4, 0, Math.PI * 2);
+                    }
+                    ctx.stroke();
+                    break;
+            }
+            
+            // Draw stars
+            stars.forEach(star => {
+                star.draw();
+            });
+        }
+
+        function checkCollisions() {
+            // Check collisions with bullets
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                let bulletHit = false;
+                
+                // Check collisions with rocks
+                for (let j = rocks.length - 1; j >= 0; j--) {
+                    const dx = bullets[i].x - rocks[j].x;
+                    const dy = bullets[i].y - rocks[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < bullets[i].width / 2 + rocks[j].radius) {
+                        if (rocks[j].takeDamage(bullets[i].damage)) {
+                            addScore(10);
+                            rocksDestroyed++;
+                            addCombo();
+                            
+                            for (let k = 0; k < 10; k++) {
+                                particles.push(new Particle(
+                                    rocks[j].x, 
+                                    rocks[j].y, 
+                                    '#ff9900',
+                                    2
+                                ));
+                            }
+                            
+                            rocks.splice(j, 1);
+                        }
+                        
+                        if (!bullets[i].piercing || bullets[i].penetrated >= 2) {
+                            bullets.splice(i, 1);
+                            bulletHit = true;
+                            break;
+                        } else {
+                            bullets[i].penetrated++;
+                        }
+                    }
+                }
+                
+                if (!bulletHit) {
+                    // Check collisions with enemies
+                    for (let j = enemies.length - 1; j >= 0; j--) {
+                        const dx = bullets[i].x - enemies[j].x;
+                        const dy = bullets[i].y - enemies[j].y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < bullets[i].width / 2 + enemies[j].radius) {
+                            if (enemies[j].takeDamage(bullets[i].damage)) {
+                                addScore(20);
+                                
+                                for (let k = 0; k < 10; k++) {
+                                    particles.push(new Particle(
+                                        enemies[j].x, 
+                                        enemies[j].y, 
+                                        '#ff0000',
+                                        2
+                                    ));
+                                }
+                                
+                                enemies.splice(j, 1);
+                            }
+                            
+                            if (!bullets[i].piercing || bullets[i].penetrated >= 2) {
+                                bullets.splice(i, 1);
+                                break;
+                            } else {
+                                bullets[i].penetrated++;
+                            }
+                        }
+                    }
+                }
+                
+                // Check collision with boss
+                if (!bulletHit && boss && boss.health > 0) {
+                    const dx = bullets[i].x - boss.x;
+                    const dy = bullets[i].y - boss.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < bullets[i].width / 2 + boss.radius) {
+                        if (boss.takeDamage(bullets[i].damage)) {
+                            boss = null;
+                            bossWarning.style.display = 'none';
+                        }
+                        
+                        if (!bullets[i].piercing || bullets[i].penetrated >= 2) {
+                            bullets.splice(i, 1);
+                        } else {
+                            bullets[i].penetrated++;
+                        }
+                    }
+                }
+                
+                // Check collision with boss bullets
+                if (!bulletHit && boss && boss.health > 0) {
+                    for (let j = boss.bullets.length - 1; j >= 0; j--) {
+                        const dx = bullets[i].x - boss.bullets[j].x;
+                        const dy = bullets[i].y - boss.bullets[j].y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < bullets[i].width / 2 + boss.bullets[j].radius) {
+                            boss.bullets.splice(j, 1);
+                            
+                            if (!bullets[i].piercing || bullets[i].penetrated >= 2) {
+                                bullets.splice(i, 1);
+                                break;
+                            } else {
+                                bullets[i].penetrated++;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Check collisions with special rockets
+            for (let i = specialRocketsArray.length - 1; i >= 0; i--) {
+                const rocket = specialRocketsArray[i];
+                
+                for (let j = rocks.length - 1; j >= 0; j--) {
+                    const dx = rocket.x - rocks[j].x;
+                    const dy = rocket.y - rocks[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < rocket.width / 2 + rocks[j].radius) {
+                        rocket.explode();
+                        specialRocketsArray.splice(i, 1);
+                        break;
+                    }
+                }
+                
+                if (i >= specialRocketsArray.length) continue;
+                
+                for (let j = enemies.length - 1; j >= 0; j--) {
+                    const dx = rocket.x - enemies[j].x;
+                    const dy = rocket.y - enemies[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < rocket.width / 2 + enemies[j].radius) {
+                        rocket.explode();
+                        specialRocketsArray.splice(i, 1);
+                        break;
+                    }
+                }
+                
+                if (i >= specialRocketsArray.length) continue;
+                
+                if (boss && boss.health > 0) {
+                    const dx = rocket.x - boss.x;
+                    const dy = rocket.y - boss.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < rocket.width / 2 + boss.radius) {
+                        rocket.explode();
+                        specialRocketsArray.splice(i, 1);
+                        break;
+                    }
+                }
+                
+                if (i < specialRocketsArray.length && rocket.update()) {
+                    specialRocketsArray.splice(i, 1);
+                }
+            }
+            
+            // Check collisions with rocks
+            for (let i = rocks.length - 1; i >= 0; i--) {
+                const rock = rocks[i];
+                const dx = player.x + player.width/2 - rock.x;
+                const dy = player.y + player.height/2 - rock.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < player.width/2 + rock.radius) {
+                    player.takeDamage(10);
+                }
+            }
+            
+            // Check collisions with power-ups
+            for (let i = powerUps.length - 1; i >= 0; i--) {
+                const powerUp = powerUps[i];
+                const dx = player.x + player.width/2 - powerUp.x;
+                const dy = player.y + player.height/2 - powerUp.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < player.width/2 + powerUp.width/2) {
+                    player.activatePowerUp(powerUp.type);
+                    powerUps.splice(i, 1);
+                } else if (powerUp.update()) {
+                    powerUps.splice(i, 1);
+                }
+            }
+            
+            // Check collisions with gold
+            for (let i = golds.length - 1; i >= 0; i--) {
+                const gold = golds[i];
+                const dx = player.x + player.width/2 - gold.x;
+                const dy = player.y + player.height/2 - gold.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < player.width/2 + gold.radius) {
+                    addGold(gold.value);
+                    golds.splice(i, 1);
+                } else if (gold.update()) {
+                    golds.splice(i, 1);
+                }
+            }
+            
+            // Check collisions with enemies
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                const enemy = enemies[i];
+                const dx = player.x + player.width/2 - enemy.x;
+                const dy = player.y + player.height/2 - enemy.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < player.width/2 + enemy.radius) {
+                    player.takeDamage(15);
+                }
+            }
+            
+            // Check collision with boss bullets
+            if (boss && boss.health > 0) {
+                for (let i = boss.bullets.length - 1; i >= 0; i--) {
+                    const bullet = boss.bullets[i];
+                    const dx = player.x + player.width/2 - bullet.x;
+                    const dy = player.y + player.height/2 - bullet.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < player.width/2 + bullet.radius) {
+                        player.takeDamage(20);
+                        boss.bullets.splice(i, 1);
+                    }
+                }
+            }
+            
+            // Check collision with boss
+            if (boss && boss.health > 0) {
+                const dx = player.x + player.width/2 - boss.x;
+                const dy = player.y + player.height/2 - boss.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < player.width/2 + boss.radius) {
+                    player.takeDamage(30);
+                }
+            }
+        }
+
+        function checkLevelComplete() {
+            if (rocks.length === 0 && enemies.length === 0 && (!boss || boss.health <= 0)) {
+                levelComplete();
+            }
+        }
+
+        function updateMission() {
+            if (!currentMission) return;
+            
+            switch(currentMission.type) {
+                case 'timed':
+                    missionTimer--;
+                    missionProgress.textContent = `Tempo rimanente: ${missionTimer} secondi - Rocce distrutte: ${rocksDestroyed}/${currentMission.target}`;
+                    
+                    if (missionTimer <= 0) {
+                        currentMission.completed = rocksDestroyed >= currentMission.target;
+                        endMission();
+                    }
+                    break;
+                    
+                case 'survival':
+                    missionTimer++;
+                    missionProgress.textContent = `Sopravvissuto: ${missionTimer} secondi/${currentMission.target}`;
+                    
+                    if (missionTimer >= currentMission.target) {
+                        currentMission.completed = true;
+                        endMission();
+                    }
+                    break;
+            }
+        }
+
+        function startMission(missionId) {
+            // Implementazione semplificata per missioni
+            missionScreen.style.display = 'flex';
+        }
+
+        function endMission() {
+            levelCompleteScreen.style.display = 'flex';
+            currentMission = null;
+        }
+
+        function unlockAchievement(achievementId) {
+            // Implementazione base per achievement
+            achievementPopup.style.display = 'block';
+            
+            setTimeout(() => {
+                achievementPopup.style.display = 'none';
+            }, 3000);
+        }
+
+        function saveGameData() {
+            localStorage.setItem('spaceGameData', JSON.stringify(gameData));
+        }
+
+        function loadGameData() {
+            const saved = localStorage.getItem('spaceGameData');
+            if (saved) {
+                gameData = JSON.parse(saved);
+            }
+        }
+
+        // ========== GAME INITIALIZATION ==========
+        function initGame() {
+            player = new Player();
+            bullets = [];
+            specialRocketsArray = [];
+            rocks = [];
+            enemies = [];
+            powerUps = [];
+            golds = [];
+            particles = [];
+            boss = null;
+            rocksDestroyed = 0;
+            goldEarnedThisLevel = 0;
+            
+            const levelConfig = levels[currentLevel];
+            
+            for (let i = 0; i < levelConfig.rocks; i++) {
+                rocks.push(new Rock());
+            }
+            
+            for (let i = 0; i < levelConfig.enemies; i++) {
+                enemies.push(new Enemy());
+            }
+            
+            // Add boss for even levels
+            if (levelConfig.boss) {
+                setTimeout(() => {
+                    bossWarning.style.display = 'block';
+                    setTimeout(() => {
+                        bossWarning.style.display = 'none';
+                        boss = new Boss(levelConfig.bossType);
+                    }, 2000);
+                }, 3000);
+            }
+            
+            stars = [];
+            for (let i = 0; i < 150; i++) {
+                stars.push(new Star(levelConfig.bgPattern));
+            }
+            
+            levelIndicator.textContent = `LIVELLO: ${currentLevel}`;
+            scoreDisplay.textContent = `PUNTI: ${score}`;
+            specialWeaponDisplay.textContent = `RAZZI: ${specialRockets}`;
+            comboDisplay.textContent = `COMBO: ${multiplier}x`;
+            goldDisplay.textContent = `GOLD: ${Math.floor(goldCount)}`;
+            
+            updateShipEvolutionDisplay();
+        }
+
+        function updateShipEvolutionDisplay() {
+            document.querySelectorAll('.ship-stage').forEach((stage, index) => {
+                if (index < shipLevel) {
+                    stage.classList.add('active');
+                } else {
+                    stage.classList.remove('active');
+                }
+            });
+        }
+
+        // ========== GAME LOOP ==========
+        function gameLoop() {
+            if (!gameActive) return;
+            
+            drawBackground();
+            
+            stars.forEach(star => {
+                star.update();
+            });
+            
+            player.update();
+            player.draw();
+            
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                if (bullets[i].update()) {
+                    bullets.splice(i, 1);
+                } else {
+                    bullets[i].draw();
+                }
+            }
+            
+            for (let i = specialRocketsArray.length - 1; i >= 0; i--) {
+                if (specialRocketsArray[i].update()) {
+                    specialRocketsArray.splice(i, 1);
+                } else {
+                    specialRocketsArray[i].draw();
+                }
+            }
+            
+            rocks.forEach(rock => {
+                rock.update();
+                rock.draw();
+            });
+            
+            enemies.forEach(enemy => {
+                enemy.update();
+                enemy.draw();
+            });
+            
+            if (boss && boss.health > 0) {
+                boss.update();
+                boss.draw();
+                
+                // Draw boss bullets
+                boss.bullets.forEach(bullet => {
+                    bullet.draw();
+                });
+            }
+            
+            powerUps.forEach(powerUp => {
+                powerUp.draw();
+            });
+            
+            golds.forEach(gold => {
+                gold.draw();
+            });
+            
+            for (let i = particles.length - 1; i >= 0; i--) {
+                if (particles[i].update()) {
+                    particles.splice(i, 1);
+                } else {
+                    particles[i].draw();
+                }
+            }
+            
+            checkCollisions();
+            checkLevelComplete();
+            updateMission();
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        // ========== GAME STATE MANAGEMENT ==========
+        function startGame() {
+            gameActive = true;
+            startScreen.style.display = 'none';
+            missionScreen.style.display = 'none';
+            initGame();
+            gameLoop();
+        }
+
+        function levelComplete() {
+            gameActive = false;
+            
+            document.getElementById('level-gold-earned').textContent = Math.floor(goldEarnedThisLevel);
+            document.getElementById('total-gold-after-level').textContent = Math.floor(goldCount);
+            
+            currentLevel++;
+            
+            if (currentLevel > 6) {
+                levelCompleteText.textContent = `Congratulazioni! Hai completato tutti i livelli! Punteggio finale: ${score}`;
+                currentLevel = 1;
+                score = 0;
+                goldCount = 0;
+                shipLevel = 1;
+            }
+            
+            levelCompleteScreen.style.display = 'flex';
+        }
+
+        function gameOver() {
+            gameActive = false;
+            
+            document.getElementById('gameover-gold-earned').textContent = Math.floor(goldEarnedThisLevel);
+            document.getElementById('gameover-score').textContent = score;
+            
+            if (score > gameData.highScore) {
+                gameData.highScore = score;
+                saveGameData();
+            }
+            
+            gameOverText.textContent = `La tua navicella è stata distrutta!`;
+            gameOverScreen.style.display = 'flex';
+        }
+
+        function nextLevel() {
+            levelCompleteScreen.style.display = 'none';
+            startGame();
+        }
+
+        function restartGame() {
+            gameOverScreen.style.display = 'none';
+            currentLevel = 1;
+            score = 0;
+            specialRockets = 0;
+            goldCount = 0;
+            goldEarnedThisLevel = 0;
+            shipLevel = 1;
+            startGame();
+        }
+
+        function selectShip() {
+            startScreen.style.display = 'none';
+            shipSelectScreen.style.display = 'flex';
+        }
+
+        function confirmShip() {
+            shipSelectScreen.style.display = 'none';
+            startScreen.style.display = 'flex';
+            updateShipEvolutionDisplay();
+        }
+
+        function backToMenu() {
+            shipSelectScreen.style.display = 'none';
+            startScreen.style.display = 'flex';
+        }
+
+        // ========== EVENT LISTENERS ==========
+        startBtn.addEventListener('click', startGame);
+        nextLevelBtn.addEventListener('click', nextLevel);
+        restartBtn.addEventListener('click', restartGame);
+        selectShipBtn.addEventListener('click', selectShip);
+        confirmShipBtn.addEventListener('click', confirmShip);
+        backToMenuBtn.addEventListener('click', backToMenu);
+        startMissionBtn.addEventListener('click', startGame);
+
+        document.querySelectorAll('.ship-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.ship-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                this.classList.add('selected');
+                selectedShip = this.getAttribute('data-ship');
+            });
+        });
+
+        window.addEventListener('keydown', function(e) {
+            keys[e.key] = true;
+        });
+
+        window.addEventListener('keyup', function(e) {
+            keys[e.key] = false;
+        });
+
+        window.addEventListener('load', function() {
+            loadGameData();
+            resizeCanvas();
+            updateShipEvolutionDisplay();
+        });
+
+        window.addEventListener('resize', function() {
+            resizeCanvas();
+        });
+
+        // Inizializzazione
+        initGame();
+    </script>
+</body>
+</html>
